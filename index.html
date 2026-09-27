@@ -1,0 +1,2052 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  
+  <!-- Мета-теги против кэширования старого кода браузером -->
+  <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+  <meta http-equiv="Pragma" content="no-cache">
+  <meta http-equiv="Expires" content="0">
+
+  <title>Отчет по закрытию отделений и График</title>
+
+  <style>
+    :root {
+      --bg-color: #0f172a;
+      --text-color: #f8fafc;
+      --header-bg: linear-gradient(135deg, #0f172a, #1e293b);
+      --header-border: #334155;
+      --card-bg: linear-gradient(135deg, #1e293b, #0f172a);
+      --card-border: #334155;
+      --card-hover-border: #475569;
+      --card-closed-bg: linear-gradient(135deg, #064e3b, #0f172a);
+      --card-closed-border: rgba(34, 197, 94, 0.4);
+      --input-bg: #1e293b;
+      --input-border: #334155;
+      --input-text: #f8fafc;
+      --status-btn-bg: rgba(51, 65, 85, 0.6);
+      --status-btn-text: #94a3b8;
+      --status-btn-border: #334155;
+      --status-btn-active-bg: linear-gradient(135deg, #22c55e, #16a34a);
+      --status-btn-active-text: #ffffff;
+      --status-btn-active-shadow: 0 0 14px rgba(34, 197, 94, 0.4);
+      --modal-bg: #0f172a;
+      --modal-border: #334155;
+      --modal-overlay: rgba(15, 23, 42, 0.8);
+      --badge-bg: #0f172a;
+      --badge-border: #334155;
+      --theme-btn-bg: #1e293b;
+      --theme-btn-border: #334155;
+      --theme-btn-color: #fbbf24;
+      --chat-msg-other-bg: #1e293b;
+      --chat-msg-other-border: rgba(255, 255, 255, 0.08);
+      --chat-msg-text: #f8fafc;
+
+      --color-98-bg: #1d4ed8;
+      --color-98-text: #ffffff;
+      --color-163-bg: #d97706;
+      --color-163-text: #ffffff;
+      --color-vh-bg: #15803d;
+      --color-vh-text: #ffffff;
+    }
+
+    [data-theme="light"] {
+      --bg-color: #f8fafc;
+      --text-color: #0f172a;
+      --header-bg: #ffffff;
+      --header-border: #e2e8f0;
+      --card-bg: #ffffff;
+      --card-border: #e2e8f0;
+      --card-hover-border: #cbd5e1;
+      --card-closed-bg: #f0fdf4;
+      --card-closed-border: #86efac;
+      --input-bg: #ffffff;
+      --input-border: #cbd5e1;
+      --input-text: #0f172a;
+      
+      --status-btn-bg: #f1f5f9;
+      --status-btn-text: #64748b;
+      --status-btn-border: #cbd5e1;
+      
+      --status-btn-active-bg: linear-gradient(135deg, #4ade80, #22c55e);
+      --status-btn-active-text: #ffffff;
+      --status-btn-active-shadow: 0 4px 12px rgba(34, 197, 94, 0.25);
+      
+      --modal-bg: #ffffff;
+      --modal-border: #e2e8f0;
+      --modal-overlay: rgba(15, 23, 42, 0.3);
+      --badge-bg: #ffffff;
+      --badge-border: #e2e8f0;
+      --theme-btn-bg: #f1f5f9;
+      --theme-btn-border: #cbd5e1;
+      --theme-btn-color: #4f46e5;
+      --chat-msg-other-bg: #f1f5f9;
+      --chat-msg-other-border: #e2e8f0;
+      --chat-msg-text: #0f172a;
+
+      --color-98-bg: #3b82f6;
+      --color-98-text: #ffffff;
+      --color-163-bg: #fef3c7;
+      --color-163-text: #78350f;
+      --color-vh-bg: #22c55e;
+      --color-vh-text: #ffffff;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    }
+
+    body {
+      background-color: var(--bg-color);
+      color: var(--text-color);
+      padding: 16px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      min-height: 100vh;
+      transition: background-color 0.3s ease, color 0.3s ease;
+    }
+
+    body.modal-open {
+      overflow: hidden !important;
+      touch-action: none;
+    }
+
+    .header {
+      background: var(--header-bg);
+      border: 1px solid var(--header-border);
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+      width: 100%;
+      max-width: 500px;
+      position: sticky;
+      top: 0;
+      padding: 12px 16px;
+      border-radius: 12px;
+      margin-bottom: 16px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      z-index: 10;
+      transition: all 0.3s ease;
+    }
+
+    .title {
+      font-size: 1.1rem;
+      font-weight: 700;
+    }
+
+    .header-controls {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .theme-toggle-btn, .icon-trigger-btn {
+      background: var(--theme-btn-bg);
+      border: 1px solid var(--theme-btn-border);
+      color: var(--text-color);
+      width: 38px;
+      height: 38px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+      flex-shrink: 0;
+    }
+
+    .theme-toggle-btn {
+      color: var(--theme-btn-color);
+    }
+
+    .theme-toggle-btn:hover, .icon-trigger-btn:hover {
+      transform: scale(1.08);
+    }
+
+    .chat-trigger-btn {
+      background: linear-gradient(135deg, #6366f1, #8b5cf6);
+      border: none;
+      color: #ffffff;
+      width: 38px;
+      height: 38px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      position: relative;
+      transition: all 0.2s ease;
+      box-shadow: 0 4px 12px rgba(139, 92, 246, 0.3);
+      flex-shrink: 0;
+    }
+
+    .chat-trigger-btn:hover {
+      background: linear-gradient(135deg, #4f46e5, #7c3aed);
+      transform: scale(1.08);
+    }
+
+    .chat-badge {
+      position: absolute;
+      top: -3px;
+      right: -3px;
+      background-color: #ef4444;
+      color: #fff;
+      font-size: 0.7rem;
+      font-weight: 700;
+      border-radius: 10px;
+      padding: 2px 6px;
+      display: none;
+      border: 2px solid var(--modal-bg);
+    }
+
+    .counter {
+      background: rgba(56, 189, 248, 0.12);
+      color: #0284c7;
+      border: 1px solid rgba(56, 189, 248, 0.4);
+      padding: 6px 10px;
+      border-radius: 20px;
+      font-weight: 700;
+      font-size: 0.85rem;
+      cursor: pointer;
+      user-select: none;
+      transition: all 0.2s ease;
+      white-space: nowrap;
+    }
+
+    [data-theme="dark"] .counter {
+      color: #38bdf8;
+      border-color: rgba(56, 189, 248, 0.3);
+    }
+
+    .counter:hover {
+      background: #0284c7;
+      color: #ffffff;
+      border-color: #38bdf8;
+    }
+
+    .search-container {
+      width: 100%;
+      max-width: 500px;
+      margin-bottom: 16px;
+      position: relative;
+    }
+
+    .search-input {
+      width: 100%;
+      background-color: var(--input-bg);
+      border: 1px solid var(--input-border);
+      color: var(--input-text);
+      padding: 12px 40px 12px 16px;
+      border-radius: 10px;
+      font-size: 1rem;
+      outline: none;
+      transition: border-color 0.2s, background-color 0.3s ease;
+    }
+
+    .search-input:focus {
+      border-color: #38bdf8;
+    }
+
+    .clear-search-btn {
+      position: absolute;
+      right: 12px;
+      top: 50%;
+      transform: translateY(-50%);
+      background: none;
+      border: none;
+      color: #94a3b8;
+      font-size: 1.2rem;
+      cursor: pointer;
+      display: none;
+      padding: 4px;
+    }
+
+    .grid {
+      width: 100%;
+      max-width: 500px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      margin-bottom: 30px;
+    }
+
+    .card {
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      border-radius: 12px;
+      padding: 12px 16px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.03);
+    }
+
+    .card:hover {
+      border-color: var(--card-hover-border);
+      transform: translateY(-1px);
+    }
+
+    .card.is-closed {
+      border-color: var(--card-closed-border);
+      background: var(--card-closed-bg);
+    }
+
+    .branch-name {
+      font-weight: 600;
+      font-size: 1rem;
+      color: var(--text-color);
+      letter-spacing: 0.3px;
+    }
+
+    .status-btn {
+      background-color: var(--status-btn-bg);
+      color: var(--status-btn-text);
+      border: 1px solid var(--status-btn-border);
+      padding: 10px 16px;
+      border-radius: 8px;
+      font-weight: 600;
+      font-size: 0.88rem;
+      cursor: pointer;
+      outline: none;
+      transition: all 0.2s ease;
+      min-width: 115px;
+      text-align: center;
+      touch-action: manipulation;
+    }
+
+    .status-btn:hover {
+      filter: brightness(0.95);
+    }
+
+    .status-btn.active {
+      background: var(--status-btn-active-bg);
+      color: var(--status-btn-active-text);
+      border-color: #22c55e;
+      font-weight: 700;
+      box-shadow: var(--status-btn-active-shadow);
+    }
+
+    .status-btn.active:hover {
+      filter: brightness(1.05);
+      transform: scale(1.02);
+    }
+
+    .no-results {
+      text-align: center;
+      color: #94a3b8;
+      padding: 20px;
+      font-size: 0.95rem;
+    }
+
+    .footer {
+      width: 100%;
+      max-width: 500px;
+      text-align: center;
+      margin-top: auto;
+      bottom: 5px;
+      padding-bottom: 5px;
+      position: sticky;
+      padding-top: 10px;
+    }
+
+    .reset-btn {
+      background-color: var(--bg-color);
+      color: #ef4444;
+      border: 1px solid #ef4444;
+      padding: 10px 20px;
+      border-radius: 8px;
+      font-weight: 600;
+      cursor: pointer;
+      width: 100%;
+      transition: background-color 0.2s ease;
+    }
+
+    .reset-btn:active {
+      background-color: rgba(239, 68, 68, 0.1);
+    }
+
+    .modal-overlay {
+      position: fixed;
+      top: 0; left: 0; width: 100%; height: 100%;
+      background: var(--modal-overlay);
+      backdrop-filter: blur(4px);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      z-index: 100;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.2s ease;
+      padding: 16px;
+      overscroll-behavior: contain;
+    }
+
+    .modal-overlay.active {
+      opacity: 1;
+      pointer-events: auto;
+    }
+
+    .modal-card {
+      border: 1px solid var(--modal-border);
+      border-radius: 16px;
+      width: 100%;
+      max-width: 480px;
+      display: flex;
+      flex-direction: column;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+      overflow: hidden;
+      background-color: var(--modal-bg);
+      color: var(--text-color);
+    }
+
+    .modal-header {
+      padding: 12px 16px;
+      background-color: var(--header-bg);
+      border-bottom: 1px solid var(--modal-border);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .modal-header-title {
+      font-weight: 600;
+      font-size: 1rem;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .modal-close-btn {
+      background: none;
+      border: none;
+      color: #94a3b8;
+      font-size: 1.4rem;
+      cursor: pointer;
+      padding: 4px;
+      line-height: 1;
+    }
+
+    .calendar-modal-body {
+      padding: 16px;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      max-height: 85vh;
+      overflow-y: auto;
+    }
+
+    .auth-block {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      text-align: center;
+      padding: 20px 10px;
+    }
+
+    .pass-input {
+      background: var(--input-bg);
+      border: 1px solid var(--input-border);
+      color: var(--input-text);
+      padding: 12px;
+      border-radius: 10px;
+      font-size: 1.1rem;
+      text-align: center;
+      outline: none;
+    }
+
+    .pass-btn {
+      background: #3b82f6;
+      color: #fff;
+      border: none;
+      padding: 12px;
+      border-radius: 10px;
+      font-weight: 700;
+      cursor: pointer;
+    }
+
+    .calendar-nav {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      padding: 8px 12px;
+      border-radius: 10px;
+    }
+
+    .cal-btn {
+      background: none;
+      border: 1px solid var(--card-border);
+      color: var(--text-color);
+      width: 30px; height: 30px;
+      border-radius: 6px;
+      cursor: pointer;
+      font-weight: bold;
+    }
+
+    .cal-title { font-weight: 700; }
+
+    .cal-legend {
+      display: flex;
+      justify-content: space-around;
+      font-size: 0.75rem;
+      font-weight: 600;
+      background: var(--card-bg);
+      padding: 8px;
+      border-radius: 8px;
+      border: 1px solid var(--card-border);
+    }
+
+    .leg-item { display: flex; align-items: center; gap: 4px; }
+    .leg-dot { width: 10px; height: 10px; border-radius: 2px; }
+
+    .cal-grid {
+      display: grid;
+      grid-template-columns: repeat(7, 1fr);
+      gap: 6px;
+    }
+
+    .cal-weekday {
+      text-align: center;
+      font-size: 0.72rem;
+      font-weight: 700;
+      color: #94a3b8;
+    }
+
+    .cal-day {
+      aspect-ratio: 1;
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      border-radius: 8px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: space-between;
+      padding: 4px;
+      cursor: pointer;
+      user-select: none;
+      transition: opacity 0.2s ease, filter 0.2s ease;
+    }
+
+    /* Стиль для прошедших дней */
+    .cal-day.past {
+      opacity: 0.4;
+      filter: grayscale(35%);
+      background: rgba(15, 23, 42, 0.3);
+    }
+
+    .cal-day.empty {
+      opacity: 0.1;
+      pointer-events: none;
+      border: none;
+      background: transparent;
+    }
+
+    .cal-day-num { font-size: 0.75rem; font-weight: 600; align-self: flex-start; }
+    .cal-day-badge { font-size: 0.7rem; font-weight: 800; line-height: 1; }
+
+    .cal-day.st-98 { background: var(--color-98-bg); color: var(--color-98-text); border-color: transparent; }
+    .cal-day.st-163 { background: var(--color-163-bg); color: var(--color-163-text); border-color: transparent; }
+    .cal-day.st-vh { background: var(--color-vh-bg); color: var(--color-vh-text); border-color: transparent; }
+
+    .shift-modal-card {
+      background: var(--modal-bg);
+      border: 1px solid var(--modal-border);
+      border-radius: 14px;
+      padding: 16px;
+      width: 280px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .shift-opt-btn {
+      padding: 10px;
+      border-radius: 8px;
+      border: none;
+      font-weight: 700;
+      color: #fff;
+      cursor: pointer;
+      display: flex;
+      justify-content: space-between;
+    }
+
+    .opt-98 { background: var(--color-98-bg); }
+    .opt-163 { background: var(--color-163-bg); color: var(--color-163-text); }
+    .opt-vh { background: var(--color-vh-bg); }
+    .opt-reset { background: transparent; border: 1px solid var(--card-border); color: #ef4444; }
+
+    .chat-modal {
+      height: 85vh;
+      max-height: 650px;
+    }
+
+    .chat-messages::-webkit-scrollbar, .sticker-picker::-webkit-scrollbar { width: 5px; }
+    .chat-messages::-webkit-scrollbar-thumb, .sticker-picker::-webkit-scrollbar-thumb { background: var(--status-btn-border); border-radius: 10px; }
+
+    .chat-messages {
+      flex: 1; padding: 18px; overflow-y: auto; display: flex; flex-direction: column; gap: 10px; background: var(--bg-color); overscroll-behavior: contain;
+    }
+
+    .chat-message {
+      position: relative; background: var(--chat-msg-other-bg); border: 1px solid var(--chat-msg-other-border); padding: 10px 14px; border-radius: 16px 16px 16px 4px; max-width: 80%; word-wrap: break-word; align-self: flex-start; box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+    }
+
+    .chat-message.my-message {
+      align-self: flex-end; background: linear-gradient(135deg, #3b82f6, #2563eb); border: none; border-radius: 16px 16px 4px 16px;
+    }
+
+    .message-meta { display: flex; justify-content: space-between; align-items: center; gap: 12px; font-size: 0.72rem; margin-bottom: 4px; }
+    .message-sender { font-weight: 700; }
+    .chat-message.my-message .message-sender { color: #e0f2fe !important; }
+    .message-time { color: var(--status-btn-text); font-size: 0.68rem; }
+    .chat-message.my-message .message-time { color: rgba(255, 255, 255, 0.8); }
+    .message-text { font-size: 0.95rem; line-height: 1.4; color: var(--chat-msg-text); }
+    .chat-message.my-message .message-text { color: #ffffff; }
+
+    .chat-input-area { padding: 10px 14px; background: var(--header-bg); border-top: 1px solid var(--modal-border); display: flex; align-items: center; gap: 10px; }
+    .sticker-toggle-btn { background: var(--status-btn-bg); border: 1px solid var(--status-btn-border); font-size: 1.2rem; cursor: pointer; width: 40px; height: 40px; border-radius: 12px; display: flex; align-items: center; justify-content: center; }
+    .chat-input { flex: 1; background: var(--input-bg); border: 1px solid var(--input-border); color: var(--input-text); padding: 10px 16px; border-radius: 12px; font-size: 0.95rem; outline: none; }
+    .chat-send-btn { width: 42px; height: 40px; background: linear-gradient(135deg, #38bdf8, #0284c7); color: #ffffff; border: none; border-radius: 12px; display: flex; align-items: center; justify-content: center; cursor: pointer; }
+
+    .sticker-picker { background: var(--modal-bg); border-top: 1px solid var(--modal-border); padding: 12px 14px; display: none; flex-direction: column; gap: 10px; max-height: 260px; overflow-y: auto; }
+    .sticker-picker.active { display: flex; }
+    .sticker-grid { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 8px; }
+    .sticker-item { display: flex; align-items: center; justify-content: center; cursor: pointer; padding: 8px; background: var(--status-btn-bg); border: 1px solid var(--status-btn-border); border-radius: 12px; }
+    .sticker-item img { width: 40px; height: 40px; object-fit: contain; }
+
+    .chat-message.is-sticker { background: transparent !important; border: none !important; padding: 4px !important; box-shadow: none !important; }
+    .chat-message.is-sticker img.tg-sticker-img { width: 110px; height: 110px; object-fit: contain; display: block; }
+
+    .pending-body { padding: 20px; max-height: 70vh; overflow-y: auto; }
+    .pending-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(75px, 1fr)); gap: 10px; }
+    .pending-badge { background-color: var(--badge-bg); border: 1px solid var(--badge-border); color: #0284c7; font-weight: 700; font-size: 1.05rem; padding: 12px 8px; border-radius: 10px; text-align: center; }
+    [data-theme="dark"] .pending-badge { color: #38bdf8; }
+    .pending-empty { text-align: center; color: #22c55e; font-weight: 600; padding: 30px 10px; font-size: 1.1rem; }
+
+    /* ==========================================
+       ОТВЕТСТВЕННЫЕ ЗА ОТКРЫТИЕ
+       ========================================== */
+    .opening-responsibles-body {
+      padding: 14px;
+      max-height: 85vh;
+      overflow-y: auto;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .opening-plan-header {
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      border-radius: 12px;
+      padding: 12px 14px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+    }
+
+    .opening-plan-title {
+      font-size: 0.95rem;
+      font-weight: 800;
+    }
+
+    .opening-plan-date {
+      margin-top: 2px;
+      font-size: 0.78rem;
+      color: var(--status-btn-text);
+      font-weight: 600;
+    }
+
+    .opening-plan-badge {
+      padding: 6px 8px;
+      border-radius: 8px;
+      background: rgba(34, 197, 94, 0.12);
+      color: #22c55e;
+      font-size: 0.68rem;
+      font-weight: 800;
+      white-space: nowrap;
+    }
+
+    .opening-info {
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      border-radius: 10px;
+      padding: 10px 12px;
+      font-size: 0.82rem;
+      color: var(--status-btn-text);
+      line-height: 1.4;
+    }
+
+    .opening-date-block {
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      border-radius: 12px;
+      padding: 10px;
+    }
+
+    .opening-date-title {
+      font-size: 0.88rem;
+      font-weight: 800;
+      margin-bottom: 8px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .opening-date-badge {
+      font-size: 0.72rem;
+      color: #38bdf8;
+      font-weight: 700;
+    }
+
+    .opening-branch {
+      border: 1px solid var(--card-border);
+      background: var(--input-bg);
+      border-radius: 10px;
+      padding: 10px;
+      margin-top: 8px;
+    }
+
+    .opening-branch-head {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+    }
+
+    .opening-branch-name {
+      font-weight: 700;
+      font-size: 0.92rem;
+    }
+
+    .opening-add-btn {
+      width: 32px;
+      height: 32px;
+      border: 1px solid var(--input-border);
+      background: var(--status-btn-bg);
+      color: var(--text-color);
+      border-radius: 8px;
+      font-size: 1.25rem;
+      line-height: 1;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+
+    .opening-add-btn:hover {
+      transform: scale(1.05);
+    }
+
+    .opening-contact {
+      margin-top: 8px;
+      padding: 9px;
+      border-radius: 9px;
+      border: 1px solid var(--card-border);
+      background: var(--card-bg);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .opening-contact.assigned {
+      border-color: #22c55e;
+      background: rgba(34, 197, 94, 0.13);
+      box-shadow: 0 0 0 1px rgba(34, 197, 94, 0.16);
+    }
+
+    .opening-contact-choice {
+      width: 24px;
+      height: 24px;
+      border: 2px solid var(--input-border);
+      background: transparent;
+      border-radius: 50%;
+      flex-shrink: 0;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 0;
+    }
+
+    .opening-contact-choice.selected {
+      border-color: #22c55e;
+      background: #22c55e;
+    }
+
+    .opening-choice-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: transparent;
+    }
+
+    .opening-contact-choice.selected .opening-choice-dot {
+      background: #fff;
+    }
+
+    .opening-contact-info {
+      flex: 1;
+      min-width: 0;
+    }
+
+    .opening-contact-name-row {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      min-width: 0;
+      flex-wrap: wrap;
+    }
+
+    .opening-tomorrow-label,
+    .opening-today-label {
+      font-size: 0.62rem;
+      font-weight: 800;
+      padding: 3px 5px;
+      border-radius: 5px;
+      white-space: nowrap;
+    }
+
+    .opening-tomorrow-label {
+      color: #fff;
+      background: #22c55e;
+    }
+
+    .opening-today-label {
+      color: #38bdf8;
+      background: rgba(56, 189, 248, 0.12);
+    }
+
+    .opening-contact-name {
+      font-weight: 700;
+      font-size: 0.88rem;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    .opening-phone {
+      display: inline-block;
+      margin-top: 2px;
+      color: #38bdf8;
+      text-decoration: none;
+      font-size: 0.86rem;
+      font-weight: 600;
+    }
+
+    .opening-phone:hover {
+      text-decoration: underline;
+    }
+
+    .opening-contact-actions {
+      display: flex;
+      gap: 5px;
+      flex-shrink: 0;
+    }
+
+    .opening-mini-btn {
+      width: 30px;
+      height: 30px;
+      border: 1px solid var(--input-border);
+      background: var(--status-btn-bg);
+      color: var(--text-color);
+      border-radius: 7px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.85rem;
+    }
+
+    .opening-mini-btn.delete {
+      color: #ef4444;
+    }
+
+    .opening-empty {
+      color: var(--status-btn-text);
+      font-size: 0.78rem;
+      margin-top: 7px;
+      text-align: center;
+      padding: 4px;
+    }
+
+    .opening-no-assigned {
+      margin-top: 8px;
+      color: #f59e0b;
+      font-size: 0.75rem;
+      font-weight: 700;
+      text-align: center;
+    }
+
+    .opening-assign-hint {
+      margin-top: 8px;
+      color: #22c55e;
+      font-size: 0.75rem;
+      font-weight: 700;
+      text-align: center;
+    }
+
+    .opening-contact-form {
+      margin-top: 9px;
+      padding: 10px;
+      border: 1px solid var(--input-border);
+      border-radius: 9px;
+      background: var(--bg-color);
+      display: none;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .opening-contact-form.active {
+      display: flex;
+    }
+
+    .opening-contact-form input {
+      width: 100%;
+      background: var(--input-bg);
+      color: var(--input-text);
+      border: 1px solid var(--input-border);
+      border-radius: 8px;
+      padding: 9px 10px;
+      outline: none;
+      font-size: 0.9rem;
+    }
+
+    .opening-form-actions {
+      display: flex;
+      gap: 7px;
+    }
+
+    .opening-form-btn {
+      flex: 1;
+      padding: 9px;
+      border-radius: 8px;
+      border: 1px solid var(--input-border);
+      cursor: pointer;
+      font-weight: 700;
+      background: var(--status-btn-bg);
+      color: var(--text-color);
+    }
+
+    .opening-form-btn.save {
+      background: #22c55e;
+      color: #fff;
+      border-color: #22c55e;
+    }
+
+    .opening-form-btn.cancel {
+      color: #ef4444;
+    }
+
+    .opening-loading {
+      text-align: center;
+      padding: 30px 10px;
+      color: var(--status-btn-text);
+    }
+
+    .opening-today-note {
+      font-size: 0.72rem;
+      color: var(--status-btn-text);
+      font-weight: 600;
+    }
+
+  </style>
+
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
+</head>
+<body>
+
+  <div class="header">
+    <div class="title">КЗ</div>
+    <div class="header-controls">
+      <button class="icon-trigger-btn" onclick="openScheduleModal()" title="График работы (Пароль)">
+        <svg width="64" height="64" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <defs>
+            <linearGradient id="calHeaderGrad" x1="8" y1="12" x2="56" y2="28" gradientUnits="userSpaceOnUse">
+              <stop offset="0%" stop-color="#3B82F6"/>
+              <stop offset="100%" stop-color="#2563EB"/>
+            </linearGradient>
+
+            <linearGradient id="calBodyGrad" x1="8" y1="26" x2="56" y2="54" gradientUnits="userSpaceOnUse">
+              <stop offset="0%" stop-color="#1E293B"/>
+              <stop offset="100%" stop-color="#0F172A"/>
+            </linearGradient>
+
+            <filter id="shadow" x="2" y="8" width="60" height="52" filterUnits="userSpaceOnUse" color-interpolation-filters="sRGB">
+              <feDropShadow dx="0" dy="6" stdDeviation="4" flood-color="#000000" flood-opacity="0.35"/>
+            </filter>
+          </defs>
+
+          <g filter="url(#shadow)">
+            <rect x="8" y="24" width="48" height="30" rx="10" fill="url(#calBodyGrad)" stroke="#334155" stroke-width="1.5"/>
+            <path d="M8 22C8 16.4772 12.4772 12 18 12H46C51.5228 12 56 16.4772 56 22V26H8V22Z" fill="url(#calHeaderGrad)"/>
+            <rect x="18" y="8" width="4" height="8" rx="2" fill="#93C5FD"/>
+            <rect x="42" y="8" width="4" height="8" rx="2" fill="#93C5FD"/>
+            <circle cx="18" cy="33" r="2.2" fill="#64748B"/>
+            <circle cx="27" cy="33" r="2.2" fill="#64748B"/>
+            <circle cx="36" cy="33" r="2.2" fill="#64748B"/>
+            <circle cx="45" cy="33" r="2.2" fill="#64748B"/>
+            <circle cx="18" cy="42" r="2.2" fill="#64748B"/>
+            <rect x="23" y="38" width="8" height="8" rx="3" fill="#EF4444"/>
+            <circle cx="36" cy="42" r="2.2" fill="#64748B"/>
+            <circle cx="45" cy="42" r="2.2" fill="#64748B"/>
+          </g>
+        </svg>
+      </button>
+
+
+      <button class="icon-trigger-btn" onclick="openOpeningResponsiblesModal()" title="Ответственные за открытие" aria-label="Ответственные за открытие">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"></path>
+          <circle cx="9" cy="7" r="4"></circle>
+          <path d="M19 8v6"></path>
+          <path d="M22 11h-6"></path>
+        </svg>
+      </button>
+
+      <button class="theme-toggle-btn" id="themeToggleBtn" onclick="toggleTheme()" title="Сменить тему">
+        <svg id="sunIcon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="12" cy="12" r="5"></circle><line x1="12" y1="1" x2="12" y2="3"></line><line x1="12" y1="21" x2="12" y2="23"></line><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line><line x1="1" y1="12" x2="3" y2="12"></line><line x1="21" y1="12" x2="23" y2="12"></line><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+        </svg>
+        <svg id="moonIcon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display: none;">
+          <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+        </svg>
+      </button>
+
+      <button class="chat-trigger-btn" id="openChatBtn" onclick="openChat()" title="Открыть анонимный чат">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
+        </svg>
+        <span class="chat-badge" id="chatBadge">0</span>
+      </button>
+      <div class="counter" id="counter" onclick="openPendingModal()" title="Нажмите, чтобы увидеть незакрытые">0 / 20</div>
+    </div>
+  </div>
+
+  <div class="search-container">
+    <input type="number" id="searchInput" class="search-input" placeholder="Введите № отделения...">
+    <button class="clear-search-btn" id="clearSearchBtn" onclick="clearSearch()">✕</button>
+  </div>
+
+  <div class="grid" id="branchesGrid"></div>
+
+  <div class="footer">
+    <button class="reset-btn" id="resetBtn" onclick="resetAll()">Сбросить всё</button>
+  </div>
+
+  <!-- Модальное окно календаря -->
+  <div class="modal-overlay" id="scheduleModalOverlay" onclick="handleOverlayClick(event, 'schedule')">
+    <div class="modal-card">
+      <div class="modal-header">
+        <div class="modal-header-title"><span>График работы</span></div>
+        <button class="modal-close-btn" onclick="closeScheduleModal()">✕</button>
+      </div>
+      <div class="calendar-modal-body">
+        
+        <div class="auth-block" id="calAuthBlock">
+          <div>🔒 Вход защищен паролем</div>
+          <input type="password" id="calPassInput" class="pass-input" placeholder="Пароль доступа" maxlength="10">
+          <button class="pass-btn" onclick="verifyCalPass()">Войти</button>
+        </div>
+
+        <div id="calContentBlock" style="display: none; flex-direction: column; gap: 12px;">
+          <div class="calendar-nav">
+            <button class="cal-btn" onclick="changeCalMonth(-1)">←</button>
+            <div class="cal-title" id="calMonthTitle">Август 2026</div>
+            <button class="cal-btn" onclick="changeCalMonth(1)">→</button>
+          </div>
+
+          <div class="cal-legend">
+            <div class="leg-item"><div class="leg-dot" style="background:var(--color-98-bg)"></div> 98 отд.</div>
+            <div class="leg-item"><div class="leg-dot" style="background:var(--color-163-bg)"></div> 163 отд.</div>
+            <div class="leg-item"><div class="leg-dot" style="background:var(--color-vh-bg)"></div> ВХ</div>
+          </div>
+
+          <div class="cal-grid" id="calGrid"></div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+
+  <!-- Модальное окно ответственных за открытие -->
+  <div class="modal-overlay" id="openingResponsiblesModalOverlay" onclick="handleOverlayClick(event, 'openingResponsibles')">
+    <div class="modal-card">
+      <div class="modal-header">
+        <div class="modal-header-title"><span>📞 Ответственные за открытие</span></div>
+        <button class="modal-close-btn" onclick="closeOpeningResponsiblesModal()">✕</button>
+      </div>
+      <div class="opening-responsibles-body" id="openingResponsiblesBody">
+        <div class="opening-loading">Загрузка...</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Окно выбора смены -->
+  <div class="modal-overlay" id="shiftModalOverlay" onclick="handleOverlayClick(event, 'shift')">
+    <div class="shift-modal-card">
+      <div style="font-weight: 700; text-align: center;" id="shiftModalTitle">Назначить смену</div>
+      <button class="shift-opt-btn opt-98" onclick="setShift('98')"><span>98 Отделение</span> <span>🟦</span></button>
+      <button class="shift-opt-btn opt-163" onclick="setShift('163')"><span>163 Отделение</span> <span>🟨</span></button>
+      <button class="shift-opt-btn opt-vh" onclick="setShift('vh')"><span>Выходной (ВХ)</span> <span>🟩</span></button>
+      <button class="shift-opt-btn opt-reset" onclick="setShift(null)"><span>Сбросить день</span> <span>✕</span></button>
+    </div>
+  </div>
+
+  <!-- Окно чата -->
+  <div class="modal-overlay" id="chatModalOverlay" onclick="handleOverlayClick(event, 'chat')">
+    <div class="modal-card chat-modal">
+      <div class="modal-header">
+        <div class="modal-header-title"><span>💬 Анонимный чат</span></div>
+        <button class="modal-close-btn" onclick="closeChat()">✕</button>
+      </div>
+      <div class="chat-messages" id="chatMessages"></div>
+      <div class="sticker-picker" id="stickerPicker">
+        <div style="font-size: 0.72rem; color: var(--status-btn-text); font-weight: 700; text-transform: uppercase;">Стикеры</div>
+        <div class="sticker-grid" id="stickerGrid"></div>
+      </div>
+      <form class="chat-input-area" onsubmit="sendMessage(event)">
+        <button type="button" class="sticker-toggle-btn" onclick="toggleStickerPicker()" title="Выбрать стикер">🤡</button>
+        <input type="text" id="chatInput" class="chat-input" placeholder="Напишите сообщение..." maxlength="300" autocomplete="off">
+        <button type="submit" class="chat-send-btn">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+            <line x1="22" y1="2" x2="11" y2="13"></line>
+            <polygon points="22 2 15 22 11 13 2 9 22 2"></polygon>
+          </svg>
+        </button>
+      </form>
+    </div>
+  </div>
+
+  <!-- Окно незакрытых отделений -->
+  <div class="modal-overlay" id="pendingModalOverlay" onclick="handleOverlayClick(event, 'pending')">
+    <div class="modal-card">
+      <div class="modal-header">
+        <div class="modal-header-title"><span>⏳ Осталось закрыть</span></div>
+        <button class="modal-close-btn" onclick="closePendingModal()">✕</button>
+      </div>
+      <div class="pending-body"><div class="pending-grid" id="pendingGrid"></div></div>
+    </div>
+  </div>
+
+  <script>
+    const STORAGE_KEY_THEME = 'app_theme';
+    const sunIcon = document.getElementById('sunIcon');
+    const moonIcon = document.getElementById('moonIcon');
+
+    function applyTheme(theme) {
+      document.documentElement.setAttribute('data-theme', theme);
+      localStorage.setItem(STORAGE_KEY_THEME, theme);
+      if (theme === 'light') {
+        sunIcon.style.display = 'none';
+        moonIcon.style.display = 'block';
+      } else {
+        sunIcon.style.display = 'block';
+        moonIcon.style.display = 'none';
+      }
+    }
+
+    function toggleTheme() {
+      const currentTheme = document.documentElement.getAttribute('data-theme') || 'dark';
+      applyTheme(currentTheme === 'dark' ? 'light' : 'dark');
+    }
+
+    applyTheme(localStorage.getItem(STORAGE_KEY_THEME) || 'dark');
+
+    const BRANCH_NUMBERS = [51, 37, 57, 7, 124, 148, 88, 127, 119, 68, 163, 76, 95, 98, 96, 122, 50, 53, 17, 110];
+    const INITIAL_STATUSES = {"51":false,"37":false,"57":false,"7":false,"124":false,"148":false,"88":false,"127":false,"119":false,"68":false,"163":false,"76":false,"95":false,"98":false,"96":false,"122":false,"50":false,"53":false,"17":false,"110":false};
+    const APP_VERSION = '1.0.6';
+
+    const TELEGRAM_STICKERS = [
+      "https://em-content.zobj.net/source/telegram/386/clown-face_1f921.webp",
+      "https://em-content.zobj.net/source/telegram/386/cat-with-tears-of-joy_1f639.webp",
+      "https://em-content.zobj.net/source/telegram/386/crying-cat_1f63f.webp",
+      "https://em-content.zobj.net/source/telegram/386/screaming-cat_1f640.webp",
+      "https://em-content.zobj.net/source/telegram/386/face-with-tears-of-joy_1f602.webp",
+      "https://em-content.zobj.net/source/telegram/386/partying-face_1f973.webp",
+      "https://em-content.zobj.net/source/telegram/386/thumbs-up_1f44d.webp",
+      "https://em-content.zobj.net/source/telegram/386/fire_1f525.webp"
+    ];
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyArdBRpk8EyzBJ_Uruk2rYGzlzdS-Eaj50",
+      authDomain: "mid-np-470dc.firebaseapp.com",
+      databaseURL: "https://mid-np-470dc-default-rtdb.europe-west1.firebasedatabase.app",
+      projectId: "mid-np-470dc",
+      storageBucket: "mid-np-470dc.firebasestorage.app",
+      messagingSenderId: "1051368843938",
+      appId: "1:1051368843938:web:bf019281005027580345fb"
+    };
+
+    firebase.initializeApp(firebaseConfig);
+    const db = firebase.database();
+
+    function versionToNumbers(version) {
+      return String(version || '0')
+        .split('.')
+        .map(part => parseInt(part, 10) || 0);
+    }
+
+    function isRemoteVersionNewer(remoteVersion) {
+      const remote = versionToNumbers(remoteVersion);
+      const local = versionToNumbers(APP_VERSION);
+      const length = Math.max(remote.length, local.length);
+
+      for (let i = 0; i < length; i++) {
+        const r = remote[i] || 0;
+        const l = local[i] || 0;
+        if (r > l) return true;
+        if (r < l) return false;
+      }
+
+      return false;
+    }
+
+    let versionCheckInProgress = false;
+
+    async function checkAppVersion() {
+      if (versionCheckInProgress) return;
+      versionCheckInProgress = true;
+
+      try {
+        const snapshot = await db.ref('app_version').once('value');
+        const remoteVersion = snapshot.val();
+
+        if (remoteVersion && isRemoteVersionNewer(remoteVersion)) {
+          const url = new URL(window.location.href);
+          url.searchParams.set('v', `${remoteVersion}-${Date.now()}`);
+          window.location.replace(url.toString());
+          return;
+        }
+      } catch (error) {
+        console.warn('Не удалось проверить версию приложения:', error);
+      } finally {
+        versionCheckInProgress = false;
+      }
+    }
+
+    function refreshPageState() {
+      if (branchesRef) branchesRef.once('value');
+    }
+
+    document.addEventListener('visibilitychange', () => {
+      if (document.visibilityState === 'visible') {
+        checkAppVersion();
+        refreshPageState();
+      }
+    });
+
+    window.addEventListener('pageshow', () => {
+      checkAppVersion();
+      refreshPageState();
+    });
+
+    checkAppVersion();
+
+    let branchesRef = db.ref('branches_status');
+    const chatRef = db.ref('chat_messages_v1');
+
+    let myUserId = localStorage.getItem('chat_user_id') || ('Аноним #' + Math.floor(100 + Math.random() * 900));
+    localStorage.setItem('chat_user_id', myUserId);
+
+    let myUserColor = localStorage.getItem('chat_user_color') || ('#' + Math.floor(Math.random()*16777215).toString(16));
+    localStorage.setItem('chat_user_color', myUserColor);
+
+    let currentStatuses = { ...INITIAL_STATUSES };
+
+    // Флаг для предотвращения повторных Push-уведомлений
+    let hasSentAllClosedPush = false;
+
+    // Мягкое воспроизведение короткого двухтонального звука через Web Audio API
+    function playNotificationSound() {
+      try {
+        const AudioContext = window.AudioContext || window.webkitAudioContext;
+        if (!AudioContext) return;
+        const ctx = new AudioContext();
+
+        const playNote = (freq, startTime, duration) => {
+          const osc = ctx.createOscillator();
+          const gain = ctx.createGain();
+          
+          osc.type = 'sine';
+          osc.frequency.setValueAtTime(freq, startTime);
+          
+          gain.gain.setValueAtTime(0.15, startTime);
+          gain.gain.exponentialRampToValueAtTime(0.0001, startTime + duration);
+          
+          osc.connect(gain);
+          gain.connect(ctx.destination);
+          
+          osc.start(startTime);
+          osc.stop(startTime + duration);
+        };
+
+        const now = ctx.currentTime;
+        playNote(523.25, now, 0.15);       // C5 (До)
+        playNote(659.25, now + 0.1, 0.3);  // E5 (Ми)
+      } catch (e) {
+        console.warn('Не удалось воспроизвести звук:', e);
+      }
+    }
+
+    // Единый слушатель изменений статусов
+    branchesRef.on('value', (snapshot) => {
+      const val = snapshot.val();
+      if (val) {
+        currentStatuses = { ...INITIAL_STATUSES, ...val };
+      } else {
+        currentStatuses = { ...INITIAL_STATUSES };
+      }
+
+      const closedCount = Object.values(currentStatuses).filter(Boolean).length;
+
+      // Проверка на закрытие всех 20 отделений
+      if (closedCount === 20 && !hasSentAllClosedPush) {
+        sendOneSignalPush();
+        playNotificationSound();
+        hasSentAllClosedPush = true;
+      } else if (closedCount < 20) {
+        hasSentAllClosedPush = false; // Сброс флага, если кто-то опять открыл отделение
+      }
+
+      renderGrid();
+      updateCounter();
+      renderPendingGrid(); // Автоматическое обновление списка незакрытых в реальном времени
+    });
+
+    function sendOneSignalPush() {
+      fetch("https://onesignal.com/api/v1/notifications", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json; charset=utf-8",
+          "Authorization": "Basic os_v2_app_c4hbcc3hbjbzzd6dphsxcgtnsoy4y7lcja3uzdet3nid7omiv5rxsceqn34pbpxozdmmat6pn327trlmwre3clrkqrg7pfrunjvitdy"
+        },
+        body: JSON.stringify({
+          app_id: "170e110b-670a-439c-8fc3-79e5711a6d93",
+          included_segments: ["Subscribed Users"],
+          contents: { "ru": "🎉 Все 20 отделений успешно закрыты!" },
+          headings: { "ru": "Отчет КЗ" }
+        })
+      }).catch(err => console.error("Ошибка отправки Push:", err));
+    }
+
+    function renderGrid() {
+      const grid = document.getElementById('branchesGrid');
+      const query = document.getElementById('searchInput').value.trim();
+      grid.innerHTML = '';
+
+      let filtered = BRANCH_NUMBERS;
+      if (query) {
+        filtered = BRANCH_NUMBERS.filter(num => String(num).includes(query));
+      }
+
+      if (filtered.length === 0) {
+        grid.innerHTML = '<div class="no-results">Отделение не найдено</div>';
+        return;
+      }
+
+      filtered.forEach(num => {
+        const isClosed = !!currentStatuses[num];
+        const card = document.createElement('div');
+        card.className = `card ${isClosed ? 'is-closed' : ''}`;
+        card.innerHTML = `
+          <span class="branch-name">Отделение №${num}</span>
+          <button class="status-btn ${isClosed ? 'active' : ''}" onclick="toggleBranch(${num})">
+            ${isClosed ? 'ЗАКРЫТО' : 'ОТКРЫТО'}
+          </button>
+        `;
+        grid.appendChild(card);
+      });
+    }
+
+    function toggleBranch(num) {
+      const current = !!currentStatuses[num];
+      db.ref(`branches_status/${num}`).set(!current);
+    }
+
+    function updateCounter() {
+      const closedCount = Object.values(currentStatuses).filter(Boolean).length;
+      document.getElementById('counter').innerText = `${closedCount} / ${BRANCH_NUMBERS.length}`;
+    }
+
+    function resetAll() {
+      if (confirm('Вы уверены, что хотите сбросить статусы всех отделений?')) {
+        const resetObj = {};
+        BRANCH_NUMBERS.forEach(num => resetObj[num] = false);
+        branchesRef.set(resetObj);
+      }
+    }
+
+    // Поиск
+    const searchInput = document.getElementById('searchInput');
+    const clearSearchBtn = document.getElementById('clearSearchBtn');
+
+    searchInput.addEventListener('input', () => {
+      clearSearchBtn.style.display = searchInput.value ? 'block' : 'none';
+      renderGrid();
+    });
+
+    function clearSearch() {
+      searchInput.value = '';
+      clearSearchBtn.style.display = 'none';
+      renderGrid();
+    }
+
+    // Модальные окна общие функции
+    function handleOverlayClick(event, type) {
+      if (event.target.classList.contains('modal-overlay')) {
+        if (type === 'schedule') closeScheduleModal();
+        if (type === 'shift') closeShiftModal();
+        if (type === 'chat') closeChat();
+        if (type === 'pending') closePendingModal();
+        if (type === 'openingResponsibles') closeOpeningResponsiblesModal();
+      }
+    }
+
+    // Незакрытые отделения
+    function renderPendingGrid() {
+      const overlay = document.getElementById('pendingModalOverlay');
+      if (!overlay.classList.contains('active')) return;
+
+      const grid = document.getElementById('pendingGrid');
+      grid.innerHTML = '';
+      const pending = BRANCH_NUMBERS.filter(num => !currentStatuses[num]);
+
+      if (pending.length === 0) {
+        grid.innerHTML = '<div class="pending-empty">🎉 Все отделения закрыты!</div>';
+      } else {
+        pending.forEach(num => {
+          const badge = document.createElement('div');
+          badge.className = 'pending-badge';
+          badge.innerText = `№${num}`;
+          grid.appendChild(badge);
+        });
+      }
+    }
+
+    function openPendingModal() {
+      document.getElementById('pendingModalOverlay').classList.add('active');
+      document.body.classList.add('modal-open');
+      renderPendingGrid();
+    }
+
+    function closePendingModal() {
+      document.getElementById('pendingModalOverlay').classList.remove('active');
+      document.body.classList.remove('modal-open');
+    }
+
+    // ==========================================
+    // ГРАФИК / КАЛЕНДАРЬ С СИНХРОНИЗАЦИЕЙ В REAL-TIME
+    // ==========================================
+    let currentCalDate = new Date();
+    let selectedCalDay = null;
+    let activeCalRef = null;
+
+    function openScheduleModal() {
+      document.getElementById('scheduleModalOverlay').classList.add('active');
+      document.body.classList.add('modal-open');
+    }
+
+    function closeScheduleModal() {
+      document.getElementById('scheduleModalOverlay').classList.remove('active');
+      document.body.classList.remove('modal-open');
+    }
+
+    function verifyCalPass() {
+      const pass = document.getElementById('calPassInput').value;
+      if (pass === '1234') {
+        document.getElementById('calAuthBlock').style.display = 'none';
+        document.getElementById('calContentBlock').style.display = 'flex';
+        initCalendarSync();
+      } else {
+        alert('Неверный пароль');
+      }
+    }
+
+    function changeCalMonth(delta) {
+      currentCalDate.setMonth(currentCalDate.getMonth() + delta);
+      initCalendarSync();
+    }
+
+    function initCalendarSync() {
+      const y = currentCalDate.getFullYear();
+      const m = currentCalDate.getMonth();
+      const monthStr = String(m + 1).padStart(2, '0');
+      const monthKey = `${y}-${monthStr}`;
+
+      const monthTitle = document.getElementById('calMonthTitle');
+      const monthNames = ["Январь", "Февраль", "Март", "Апрель", "Май", "Июнь", "Июль", "Август", "Сентябрь", "Октябрь", "Ноябрь", "Декабрь"];
+      monthTitle.innerText = `${monthNames[m]} ${y}`;
+
+      if (activeCalRef) {
+        activeCalRef.off('value');
+      }
+
+      activeCalRef = db.ref(`schedules/${monthKey}`);
+      
+      activeCalRef.on('value', snapshot => {
+        let monthData = snapshot.val() || {};
+        
+        if (!snapshot.exists()) {
+          db.ref(`schedule/${monthKey}`).once('value', legacySnap => {
+            renderCalendarGrid(legacySnap.val() || {});
+          });
+        } else {
+          renderCalendarGrid(monthData);
+        }
+      });
+    }
+
+    function renderCalendarGrid(monthData) {
+      const grid = document.getElementById('calGrid');
+      grid.innerHTML = '';
+
+      const weekdays = ["Пн", "Вт", "Ср", "Чт", "Пт", "Сб", "Вс"];
+      weekdays.forEach(wd => {
+        const el = document.createElement('div');
+        el.className = 'cal-weekday';
+        el.innerText = wd;
+        grid.appendChild(el);
+      });
+
+      const y = currentCalDate.getFullYear();
+      const m = currentCalDate.getMonth();
+      const firstDayIndex = (new Date(y, m, 1).getDay() + 6) % 7;
+      const daysInMonth = new Date(y, m + 1, 0).getDate();
+
+      // Данные сегодняшнего дня для сравнения прошедших дат
+      const today = new Date();
+      const todayYear = today.getFullYear();
+      const todayMonth = today.getMonth();
+      const todayDay = today.getDate();
+
+      for (let i = 0; i < firstDayIndex; i++) {
+        const empty = document.createElement('div');
+        empty.className = 'cal-day empty';
+        grid.appendChild(empty);
+      }
+
+      for (let d = 1; d <= daysInMonth; d++) {
+        const dayCell = document.createElement('div');
+        
+        const padD = String(d).padStart(2, '0');
+        const shiftType = monthData[`day_${d}`] || monthData[`day_${padD}`] || monthData[padD] || monthData[d];
+
+        let shiftClass = '';
+        let badgeText = '';
+        if (shiftType === '98') { shiftClass = 'st-98'; badgeText = '98'; }
+        else if (shiftType === '163') { shiftClass = 'st-163'; badgeText = '163'; }
+        else if (shiftType === 'vh') { shiftClass = 'st-vh'; badgeText = 'ВХ'; }
+
+        // Определение, прошел ли день
+        const cellDate = new Date(y, m, d);
+        const todayDate = new Date(todayYear, todayMonth, todayDay);
+        const isPast = cellDate < todayDate;
+
+        dayCell.className = `cal-day ${shiftClass} ${isPast ? 'past' : ''}`;
+        dayCell.onclick = () => openShiftModal(d);
+
+        dayCell.innerHTML = `
+          <span class="cal-day-num">${d}</span>
+          <span class="cal-day-badge">${badgeText}</span>
+        `;
+        grid.appendChild(dayCell);
+      }
+    }
+
+    function openShiftModal(day) {
+      selectedCalDay = day;
+      document.getElementById('shiftModalTitle').innerText = `День ${day}`;
+      document.getElementById('shiftModalOverlay').classList.add('active');
+    }
+
+    function closeShiftModal() {
+      document.getElementById('shiftModalOverlay').classList.remove('active');
+    }
+
+    function setShift(type) {
+      if (!selectedCalDay) return;
+
+      const y = currentCalDate.getFullYear();
+      const m = currentCalDate.getMonth();
+      const monthStr = String(m + 1).padStart(2, '0');
+      const padD = String(selectedCalDay).padStart(2, '0');
+      const monthKey = `${y}-${monthStr}`;
+
+      const refPrimary = db.ref(`schedules/${monthKey}/day_${selectedCalDay}`);
+      const refStandard = db.ref(`schedule/${monthKey}/${padD}`);
+      const refLegacy = db.ref(`schedule/${monthKey}/${selectedCalDay}`);
+
+      if (type === null) {
+        refPrimary.remove();
+        refStandard.remove();
+        refLegacy.remove();
+      } else {
+        refPrimary.set(type);
+        refStandard.set(type);
+        if (padD !== String(selectedCalDay)) {
+          refLegacy.remove();
+        }
+      }
+
+      closeShiftModal();
+    }
+
+    // Чат
+    function openChat() {
+      document.getElementById('chatModalOverlay').classList.add('active');
+      document.body.classList.add('modal-open');
+      renderStickers();
+      initChat();
+    }
+
+    function closeChat() {
+      document.getElementById('chatModalOverlay').classList.remove('active');
+      document.body.classList.remove('modal-open');
+    }
+
+    let chatInitialized = false;
+    function initChat() {
+      if (chatInitialized) return;
+      chatInitialized = true;
+
+      chatRef.limitToLast(50).on('child_added', snapshot => {
+        const msg = snapshot.val();
+        appendChatMessage(msg);
+      });
+    }
+
+    function appendChatMessage(msg) {
+      const container = document.getElementById('chatMessages');
+      const isMine = msg.userId === myUserId;
+      const messageDiv = document.createElement('div');
+
+      if (msg.isSticker) {
+        messageDiv.className = `chat-message is-sticker ${isMine ? 'my-message' : ''}`;
+        messageDiv.innerHTML = `<img class="tg-sticker-img" src="${msg.text}" alt="sticker">`;
+      } else {
+        messageDiv.className = `chat-message ${isMine ? 'my-message' : ''}`;
+        messageDiv.innerHTML = `
+          <div class="message-meta">
+            <span class="message-sender" style="color: ${msg.userColor || '#38bdf8'}">${msg.userName}</span>
+            <span class="message-time">${msg.time}</span>
+          </div>
+          <div class="message-text">${escapeHtml(msg.text)}</div>
+        `;
+      }
+
+      container.appendChild(messageDiv);
+      container.scrollTop = container.scrollHeight;
+    }
+
+    function sendMessage(e) {
+      e.preventDefault();
+      const input = document.getElementById('chatInput');
+      const text = input.value.trim();
+      if (!text) return;
+
+      const timeStr = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+      chatRef.push({
+        userId: myUserId,
+        userName: myUserId,
+        userColor: myUserColor,
+        text: text,
+        time: timeStr,
+        isSticker: false
+      });
+
+      input.value = '';
+    }
+
+    function sendSticker(url) {
+      const timeStr = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+      chatRef.push({
+        userId: myUserId,
+        userName: myUserId,
+        userColor: myUserColor,
+        text: url,
+        time: timeStr,
+        isSticker: true
+      });
+      toggleStickerPicker();
+    }
+
+    function toggleStickerPicker() {
+      const picker = document.getElementById('stickerPicker');
+      picker.classList.toggle('active');
+    }
+
+    function renderStickers() {
+      const grid = document.getElementById('stickerGrid');
+      if (grid.children.length > 0) return;
+
+      TELEGRAM_STICKERS.forEach(url => {
+        const item = document.createElement('div');
+        item.className = 'sticker-item';
+        item.onclick = () => sendSticker(url);
+        item.innerHTML = `<img src="${url}" alt="sticker">`;
+        grid.appendChild(item);
+      });
+    }
+
+
+    // ==========================================
+    // ОТВЕТСТВЕННЫЕ ЗА ОТКРЫТИЕ
+    // ==========================================
+    // Постоянные контакты хранятся здесь:
+    // opening_responsibles/contacts/{branch}/{contactId}
+    //
+    // На каждый день у отделения может быть ОДИН выбранный ответственный:
+    // opening_responsibles/assignments/{YYYY-MM-DD}/{branch}/{contactId}: true
+    //
+    // Руководитель один раз заполняет весь список контактов отделения,
+    // а вечером просто выбирает из списка человека, который откроет завтра.
+
+    const openingResponsiblesRef = db.ref('opening_responsibles');
+
+    let openingContactsData = {};
+    let openingAssignmentsData = {};
+    let openingResponsiblesListenerStarted = false;
+    let openingEditingContact = null;
+    let openingFormBranch = null;
+
+    function getLocalDateKey(date = new Date()) {
+      const y = date.getFullYear();
+      const m = String(date.getMonth() + 1).padStart(2, '0');
+      const d = String(date.getDate()).padStart(2, '0');
+      return `${y}-${m}-${d}`;
+    }
+
+    function getTomorrowDateKey() {
+      const tomorrow = new Date();
+      tomorrow.setDate(tomorrow.getDate() + 1);
+      return getLocalDateKey(tomorrow);
+    }
+
+    function formatOpeningDate(dateKey) {
+      const parts = String(dateKey).split('-').map(Number);
+      if (parts.length !== 3) return dateKey;
+
+      const date = new Date(parts[0], parts[1] - 1, parts[2]);
+      return date.toLocaleDateString('ru-RU', {
+        day: '2-digit',
+        month: '2-digit',
+        year: 'numeric'
+      });
+    }
+
+    function normalizePhoneForTel(phone) {
+      return String(phone || '').trim().replace(/[^\d+]/g, '');
+    }
+
+    function escapeOpeningText(value) {
+      return escapeHtml(String(value || ''));
+    }
+
+    function openOpeningResponsiblesModal() {
+      document.getElementById('openingResponsiblesModalOverlay').classList.add('active');
+      document.body.classList.add('modal-open');
+      startOpeningResponsiblesListener();
+      renderOpeningResponsibles();
+    }
+
+    function closeOpeningResponsiblesModal() {
+      document.getElementById('openingResponsiblesModalOverlay').classList.remove('active');
+      document.body.classList.remove('modal-open');
+      openingEditingContact = null;
+      openingFormBranch = null;
+    }
+
+    function startOpeningResponsiblesListener() {
+      if (openingResponsiblesListenerStarted) return;
+      openingResponsiblesListenerStarted = true;
+
+      openingResponsiblesRef.on('value', snapshot => {
+        const data = snapshot.val() || {};
+        openingContactsData = data.contacts || {};
+        openingAssignmentsData = data.assignments || {};
+
+        if (document.getElementById('openingResponsiblesModalOverlay').classList.contains('active')) {
+          renderOpeningResponsibles();
+        }
+      });
+    }
+
+    function getOpeningContacts(branch) {
+      const branchData = openingContactsData[String(branch)] || {};
+      return Object.entries(branchData)
+        .filter(([id, contact]) => contact && typeof contact === 'object')
+        .map(([id, contact]) => ({ id, ...contact }));
+    }
+
+    function getOpeningAssigned(branch, dateKey) {
+      const branchData = openingAssignmentsData[dateKey]?.[String(branch)] || {};
+      return branchData;
+    }
+
+    function getSingleOpeningAssignedContact(branch, dateKey) {
+      const assigned = getOpeningAssigned(branch, dateKey);
+      const ids = Object.keys(assigned).filter(id => assigned[id]);
+      return ids.length ? ids[0] : null;
+    }
+
+    function renderOpeningResponsibles() {
+      const body = document.getElementById('openingResponsiblesBody');
+      if (!body) return;
+
+      const todayKey = getLocalDateKey();
+      const tomorrowKey = getTomorrowDateKey();
+
+      let html = `
+        <div class="opening-info">
+          <b>Как пользоваться:</b> один раз добавьте всех людей, которые могут открывать отделение.
+          Вечером просто выберите <b>одного человека на завтра</b> — он подсветится зелёным.
+          Номер телефона можно нажать, чтобы сразу позвонить.
+        </div>
+
+        <div class="opening-plan-header">
+          <div>
+            <div class="opening-plan-title">Кто открывает завтра</div>
+            <div class="opening-plan-date">${formatOpeningDate(tomorrowKey)}</div>
+          </div>
+          <div class="opening-plan-badge">ПЛАН НА ЗАВТРА</div>
+        </div>
+      `;
+
+      html += renderOpeningBranches(tomorrowKey, todayKey);
+
+      body.innerHTML = html;
+    }
+
+    function renderOpeningBranches(tomorrowKey, todayKey) {
+      const sortedBranches = [...BRANCH_NUMBERS].sort((a, b) => Number(a) - Number(b));
+      let html = '';
+
+      sortedBranches.forEach(branch => {
+        const contacts = getOpeningContacts(branch);
+        const tomorrowAssignedId = getSingleOpeningAssignedContact(branch, tomorrowKey);
+        const todayAssignedId = getSingleOpeningAssignedContact(branch, todayKey);
+
+        html += `
+          <div class="opening-branch">
+            <div class="opening-branch-head">
+              <span class="opening-branch-name">Отделение №${branch}</span>
+              <button class="opening-add-btn" onclick="showOpeningContactForm(${branch})" title="Добавить постоянного ответственного">+</button>
+            </div>
+        `;
+
+        if (contacts.length === 0) {
+          html += `<div class="opening-empty">Добавьте всех возможных ответственных</div>`;
+        } else {
+          contacts.forEach(contact => {
+            const isTomorrow = tomorrowAssignedId === contact.id;
+            const isToday = todayAssignedId === contact.id;
+            const phone = escapeOpeningText(contact.phone);
+            const name = escapeOpeningText(contact.name);
+
+            html += `
+              <div class="opening-contact ${isTomorrow ? 'assigned' : ''}">
+                <button
+                  type="button"
+                  class="opening-contact-choice ${isTomorrow ? 'selected' : ''}"
+                  onclick="setOpeningTomorrowResponsible('${escapeOpeningText(branch)}', '${escapeOpeningText(contact.id)}')"
+                  title="Назначить на завтра"
+                  aria-label="Назначить ${name} на завтра"
+                >
+                  <span class="opening-choice-dot"></span>
+                </button>
+                <div class="opening-contact-info">
+                  <div class="opening-contact-name-row">
+                    <div class="opening-contact-name">${name}</div>
+                    ${isTomorrow ? '<span class="opening-tomorrow-label">ОТКРОЕТ ЗАВТРА</span>' : ''}
+                    ${isToday ? '<span class="opening-today-label">СЕГОДНЯ</span>' : ''}
+                  </div>
+                  <a class="opening-phone" href="tel:${phone}" onclick="event.stopPropagation();">${phone}</a>
+                </div>
+                <div class="opening-contact-actions">
+                  <button class="opening-mini-btn" onclick="event.stopPropagation(); editOpeningContact(${branch}, '${escapeOpeningText(contact.id)}')" title="Редактировать">✎</button>
+                  <button class="opening-mini-btn delete" onclick="event.stopPropagation(); deleteOpeningContact(${branch}, '${escapeOpeningText(contact.id)}')" title="Удалить">✕</button>
+                </div>
+              </div>
+            `;
+          });
+
+          if (tomorrowAssignedId) {
+            const assignedContact = contacts.find(c => c.id === tomorrowAssignedId);
+            if (assignedContact) {
+              html += `<div class="opening-assign-hint">✓ Завтра открывает: <b>${escapeOpeningText(assignedContact.name)}</b></div>`;
+            }
+          } else {
+            html += `<div class="opening-no-assigned">⚠ На завтра ещё никто не выбран</div>`;
+          }
+        }
+
+        if (openingFormBranch === branch) {
+          const editing = openingEditingContact && openingEditingContact.branch === branch
+            ? openingEditingContact
+            : null;
+
+          html += `
+            <div class="opening-contact-form active" id="openingForm_${branch}">
+              <input type="text" id="openingName_${branch}" placeholder="Имя ответственного" maxlength="80" value="${editing ? escapeOpeningText(editing.name) : ''}">
+              <input type="tel" id="openingPhone_${branch}" placeholder="Номер телефона" maxlength="30" value="${editing ? escapeOpeningText(editing.phone) : ''}">
+              <div class="opening-form-actions">
+                <button class="opening-form-btn save" onclick="saveOpeningContact(${branch})">${editing ? 'Сохранить' : 'Добавить'}</button>
+                <button class="opening-form-btn cancel" onclick="cancelOpeningContactForm()">Отмена</button>
+              </div>
+            </div>
+          `;
+        }
+
+        html += `</div>`;
+      });
+
+      return html;
+    }
+
+    function showOpeningContactForm(branch) {
+      openingEditingContact = null;
+      openingFormBranch = Number(branch);
+      renderOpeningResponsibles();
+
+      setTimeout(() => {
+        const nameInput = document.getElementById(`openingName_${branch}`);
+        if (nameInput) nameInput.focus();
+      }, 50);
+    }
+
+    function editOpeningContact(branch, contactId) {
+      const contact = getOpeningContacts(branch).find(item => item.id === contactId);
+      if (!contact) return;
+
+      openingEditingContact = {
+        branch: Number(branch),
+        id: contactId,
+        name: contact.name || '',
+        phone: contact.phone || ''
+      };
+      openingFormBranch = Number(branch);
+      renderOpeningResponsibles();
+
+      setTimeout(() => {
+        const nameInput = document.getElementById(`openingName_${branch}`);
+        if (nameInput) {
+          nameInput.focus();
+          nameInput.select();
+        }
+      }, 50);
+    }
+
+    function cancelOpeningContactForm() {
+      openingEditingContact = null;
+      openingFormBranch = null;
+      renderOpeningResponsibles();
+    }
+
+    async function saveOpeningContact(branch) {
+      const nameInput = document.getElementById(`openingName_${branch}`);
+      const phoneInput = document.getElementById(`openingPhone_${branch}`);
+
+      if (!nameInput || !phoneInput) return;
+
+      const name = nameInput.value.trim();
+      const phone = phoneInput.value.trim();
+
+      if (!name) {
+        alert('Введите имя ответственного');
+        nameInput.focus();
+        return;
+      }
+
+      if (!phone) {
+        alert('Введите номер телефона');
+        phoneInput.focus();
+        return;
+      }
+
+      const cleanPhone = normalizePhoneForTel(phone);
+
+      if (openingEditingContact && openingEditingContact.id) {
+        await db.ref(`opening_responsibles/contacts/${branch}/${openingEditingContact.id}`).update({
+          name,
+          phone,
+          tel: cleanPhone,
+          updatedAt: Date.now()
+        });
+      } else {
+        const newRef = db.ref(`opening_responsibles/contacts/${branch}`).push();
+        await newRef.set({
+          name,
+          phone,
+          tel: cleanPhone,
+          createdAt: Date.now(),
+          updatedAt: Date.now()
+        });
+      }
+
+      openingEditingContact = null;
+      openingFormBranch = null;
+      renderOpeningResponsibles();
+    }
+
+    async function deleteOpeningContact(branch, contactId) {
+      const contact = getOpeningContacts(branch).find(item => item.id === contactId);
+      if (!contact) return;
+
+      if (!confirm(`Удалить контакт "${contact.name}"?`)) return;
+
+      await db.ref(`opening_responsibles/contacts/${branch}/${contactId}`).remove();
+
+      const updates = {};
+      Object.keys(openingAssignmentsData || {}).forEach(dateKey => {
+        if (openingAssignmentsData[dateKey]?.[String(branch)]?.[contactId]) {
+          updates[`opening_responsibles/assignments/${dateKey}/${branch}/${contactId}`] = null;
+        }
+      });
+
+      if (Object.keys(updates).length > 0) {
+        await db.ref().update(updates);
+      }
+    }
+
+    async function setOpeningTomorrowResponsible(branch, contactId) {
+      const tomorrowKey = getTomorrowDateKey();
+      const branchPath = `opening_responsibles/assignments/${tomorrowKey}/${branch}`;
+      const currentAssignedId = getSingleOpeningAssignedContact(branch, tomorrowKey);
+
+      // Нажатие на уже выбранного человека снимает назначение.
+      if (currentAssignedId === contactId) {
+        await db.ref(`${branchPath}/${contactId}`).remove();
+        return;
+      }
+
+      // Для одного отделения всегда оставляем только одного человека.
+      const updates = {};
+      const existing = getOpeningAssigned(branch, tomorrowKey);
+      Object.keys(existing).forEach(id => {
+        updates[`${branchPath}/${id}`] = null;
+      });
+      updates[`${branchPath}/${contactId}`] = true;
+
+      await db.ref().update(updates);
+    }
+
+    function escapeHtml(str) {
+      return str.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;").replace(/'/g, "&#039;");
+    }
+  </script>
+</body>
+</html>
