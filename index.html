@@ -1,1089 +1,1089 @@
 <!DOCTYPE html>
 <html lang="ru">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  
-  <!-- Мета-теги против кэширования старого кода браузером -->
-  <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
-  <meta http-equiv="Pragma" content="no-cache">
-  <meta http-equiv="Expires" content="0">
-
-  <title>Отчет по закрытию отделений и График</title>
-
-  <style>
-    :root {
-      --bg-color: #0f172a;
-      --text-color: #f8fafc;
-      --header-bg: linear-gradient(135deg, #0f172a, #1e293b);
-      --header-border: #334155;
-      --card-bg: linear-gradient(135deg, #1e293b, #0f172a);
-      --card-border: #334155;
-      --card-hover-border: #475569;
-      --card-closed-bg: linear-gradient(135deg, #064e3b, #0f172a);
-      --card-closed-border: rgba(34, 197, 94, 0.4);
-      --input-bg: #1e293b;
-      --input-border: #334155;
-      --input-text: #f8fafc;
-      --status-btn-bg: rgba(51, 65, 85, 0.6);
-      --status-btn-text: #94a3b8;
-      --status-btn-border: #334155;
-      --status-btn-active-bg: linear-gradient(135deg, #22c55e, #16a34a);
-      --status-btn-active-text: #ffffff;
-      --status-btn-active-shadow: 0 0 14px rgba(34, 197, 94, 0.4);
-      --modal-bg: #0f172a;
-      --modal-border: #334155;
-      --modal-overlay: rgba(15, 23, 42, 0.8);
-      --badge-bg: #0f172a;
-      --badge-border: #334155;
-      --theme-btn-bg: #1e293b;
-      --theme-btn-border: #334155;
-      --theme-btn-color: #fbbf24;
-      --chat-msg-other-bg: #1e293b;
-      --chat-msg-other-border: rgba(255, 255, 255, 0.08);
-      --chat-msg-text: #f8fafc;
-
-      --color-98-bg: #1d4ed8;
-      --color-98-text: #ffffff;
-      --color-163-bg: #d97706;
-      --color-163-text: #ffffff;
-      --color-vh-bg: #15803d;
-      --color-vh-text: #ffffff;
-    }
-
-    [data-theme="light"] {
-      --bg-color: #f8fafc;
-      --text-color: #0f172a;
-      --header-bg: #ffffff;
-      --header-border: #e2e8f0;
-      --card-bg: #ffffff;
-      --card-border: #e2e8f0;
-      --card-hover-border: #cbd5e1;
-      --card-closed-bg: #f0fdf4;
-      --card-closed-border: #86efac;
-      --input-bg: #ffffff;
-      --input-border: #cbd5e1;
-      --input-text: #0f172a;
-      
-      --status-btn-bg: #f1f5f9;
-      --status-btn-text: #64748b;
-      --status-btn-border: #cbd5e1;
-      
-      --status-btn-active-bg: linear-gradient(135deg, #4ade80, #22c55e);
-      --status-btn-active-text: #ffffff;
-      --status-btn-active-shadow: 0 4px 12px rgba(34, 197, 94, 0.25);
-      
-      --modal-bg: #ffffff;
-      --modal-border: #e2e8f0;
-      --modal-overlay: rgba(15, 23, 42, 0.3);
-      --badge-bg: #ffffff;
-      --badge-border: #e2e8f0;
-      --theme-btn-bg: #f1f5f9;
-      --theme-btn-border: #cbd5e1;
-      --theme-btn-color: #4f46e5;
-      --chat-msg-other-bg: #f1f5f9;
-      --chat-msg-other-border: #e2e8f0;
-      --chat-msg-text: #0f172a;
-
-      --color-98-bg: #3b82f6;
-      --color-98-text: #ffffff;
-      --color-163-bg: #fef3c7;
-      --color-163-text: #78350f;
-      --color-vh-bg: #22c55e;
-      --color-vh-text: #ffffff;
-    }
-
-    * {
-      box-sizing: border-box;
-      margin: 0;
-      padding: 0;
-      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-    }
-
-    body {
-      background-color: var(--bg-color);
-      color: var(--text-color);
-      padding: 16px;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      min-height: 100vh;
-      transition: background-color 0.3s ease, color 0.3s ease;
-    }
-
-    body.modal-open {
-      overflow: hidden !important;
-      touch-action: none;
-    }
-
-    .header {
-      background: var(--header-bg);
-      border: 1px solid var(--header-border);
-      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
-      width: 100%;
-      max-width: 500px;
-      position: sticky;
-      top: 0;
-      padding: 12px 16px;
-      border-radius: 12px;
-      margin-bottom: 16px;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      z-index: 10;
-      transition: all 0.3s ease;
-    }
-
-    .title {
-      font-size: 1.1rem;
-      font-weight: 700;
-    }
-
-    .header-controls {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-    }
-
-    .theme-toggle-btn, .icon-trigger-btn {
-      background: var(--theme-btn-bg);
-      border: 1px solid var(--theme-btn-border);
-      color: var(--text-color);
-      width: 38px;
-      height: 38px;
-      border-radius: 50%;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      cursor: pointer;
-      transition: all 0.2s ease;
-      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
-      flex-shrink: 0;
-    }
-
-    .theme-toggle-btn {
-      color: var(--theme-btn-color);
-    }
-
-    .theme-toggle-btn:hover, .icon-trigger-btn:hover {
-      transform: scale(1.08);
-    }
-
-    .chat-trigger-btn {
-      background: linear-gradient(135deg, #6366f1, #8b5cf6);
-      border: none;
-      color: #ffffff;
-      width: 38px;
-      height: 38px;
-      border-radius: 50%;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      cursor: pointer;
-      position: relative;
-      transition: all 0.2s ease;
-      box-shadow: 0 4px 12px rgba(139, 92, 246, 0.3);
-      flex-shrink: 0;
-    }
-
-    .chat-trigger-btn:hover {
-      background: linear-gradient(135deg, #4f46e5, #7c3aed);
-      transform: scale(1.08);
-    }
-
-    .chat-badge {
-      position: absolute;
-      top: -3px;
-      right: -3px;
-      background-color: #ef4444;
-      color: #fff;
-      font-size: 0.7rem;
-      font-weight: 700;
-      border-radius: 10px;
-      padding: 2px 6px;
-      display: none;
-      border: 2px solid var(--modal-bg);
-    }
-
-    .counter {
-      background: rgba(56, 189, 248, 0.12);
-      color: #0284c7;
-      border: 1px solid rgba(56, 189, 248, 0.4);
-      padding: 6px 10px;
-      border-radius: 20px;
-      font-weight: 700;
-      font-size: 0.85rem;
-      cursor: pointer;
-      user-select: none;
-      transition: all 0.2s ease;
-      white-space: nowrap;
-    }
-
-    [data-theme="dark"] .counter {
-      color: #38bdf8;
-      border-color: rgba(56, 189, 248, 0.3);
-    }
-
-    .counter:hover {
-      background: #0284c7;
-      color: #ffffff;
-      border-color: #38bdf8;
-    }
-
-    .search-container {
-      width: 100%;
-      max-width: 500px;
-      margin-bottom: 16px;
-      position: relative;
-    }
-
-    .search-input {
-      width: 100%;
-      background-color: var(--input-bg);
-      border: 1px solid var(--input-border);
-      color: var(--input-text);
-      padding: 12px 40px 12px 16px;
-      border-radius: 10px;
-      font-size: 1rem;
-      outline: none;
-      transition: border-color 0.2s, background-color 0.3s ease;
-    }
-
-    .search-input:focus {
-      border-color: #38bdf8;
-    }
-
-    .clear-search-btn {
-      position: absolute;
-      right: 12px;
-      top: 50%;
-      transform: translateY(-50%);
-      background: none;
-      border: none;
-      color: #94a3b8;
-      font-size: 1.2rem;
-      cursor: pointer;
-      display: none;
-      padding: 4px;
-    }
-
-    .grid {
-      width: 100%;
-      max-width: 500px;
-      display: flex;
-      flex-direction: column;
-      gap: 10px;
-      margin-bottom: 30px;
-    }
-
-    .card {
-      background: var(--card-bg);
-      border: 1px solid var(--card-border);
-      border-radius: 12px;
-      padding: 12px 16px;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
-      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.03);
-    }
-
-    .card:hover {
-      border-color: var(--card-hover-border);
-      transform: translateY(-1px);
-    }
-
-    .card.is-closed {
-      border-color: var(--card-closed-border);
-      background: var(--card-closed-bg);
-    }
-
-    .branch-name {
-      font-weight: 600;
-      font-size: 1rem;
-      color: var(--text-color);
-      letter-spacing: 0.3px;
-    }
-
-    .status-btn {
-      background-color: var(--status-btn-bg);
-      color: var(--status-btn-text);
-      border: 1px solid var(--status-btn-border);
-      padding: 10px 16px;
-      border-radius: 8px;
-      font-weight: 600;
-      font-size: 0.88rem;
-      cursor: pointer;
-      outline: none;
-      transition: all 0.2s ease;
-      min-width: 115px;
-      text-align: center;
-      touch-action: manipulation;
-    }
-
-    .status-btn:hover {
-      filter: brightness(0.95);
-    }
-
-    .status-btn.active {
-      background: var(--status-btn-active-bg);
-      color: var(--status-btn-active-text);
-      border-color: #22c55e;
-      font-weight: 700;
-      box-shadow: var(--status-btn-active-shadow);
-    }
-
-    .status-btn.active:hover {
-      filter: brightness(1.05);
-      transform: scale(1.02);
-    }
-
-    .no-results {
-      text-align: center;
-      color: #94a3b8;
-      padding: 20px;
-      font-size: 0.95rem;
-    }
-
-    .footer {
-      width: 100%;
-      max-width: 500px;
-      text-align: center;
-      margin-top: auto;
-      bottom: 5px;
-      padding-bottom: 5px;
-      position: sticky;
-      padding-top: 10px;
-    }
-
-    .reset-btn {
-      background-color: var(--bg-color);
-      color: #ef4444;
-      border: 1px solid #ef4444;
-      padding: 10px 20px;
-      border-radius: 8px;
-      font-weight: 600;
-      cursor: pointer;
-      width: 100%;
-      transition: background-color 0.2s ease;
-    }
-
-    .reset-btn:active {
-      background-color: rgba(239, 68, 68, 0.1);
-    }
-
-    .modal-overlay {
-      position: fixed;
-      top: 0; left: 0; width: 100%; height: 100%;
-      background: var(--modal-overlay);
-      backdrop-filter: blur(4px);
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      z-index: 100;
-      opacity: 0;
-      pointer-events: none;
-      transition: opacity 0.2s ease;
-      padding: 16px;
-      overscroll-behavior: contain;
-    }
-
-    .modal-overlay.active {
-      opacity: 1;
-      pointer-events: auto;
-    }
-
-    .modal-card {
-      border: 1px solid var(--modal-border);
-      border-radius: 16px;
-      width: 100%;
-      max-width: 480px;
-      display: flex;
-      flex-direction: column;
-      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
-      overflow: hidden;
-      background-color: var(--modal-bg);
-      color: var(--text-color);
-    }
-
-    .modal-header {
-      padding: 12px 16px;
-      background-color: var(--header-bg);
-      border-bottom: 1px solid var(--modal-border);
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-    }
-
-    .modal-header-title {
-      font-weight: 600;
-      font-size: 1rem;
-      display: flex;
-      align-items: center;
-      gap: 8px;
-    }
-
-    .modal-close-btn {
-      background: none;
-      border: none;
-      color: #94a3b8;
-      font-size: 1.4rem;
-      cursor: pointer;
-      padding: 4px;
-      line-height: 1;
-    }
-
-    .calendar-modal-body {
-      padding: 16px;
-      display: flex;
-      flex-direction: column;
-      gap: 12px;
-      max-height: 85vh;
-      overflow-y: auto;
-    }
-
-    .auth-block {
-      display: flex;
-      flex-direction: column;
-      gap: 12px;
-      text-align: center;
-      padding: 20px 10px;
-    }
-
-    .pass-input {
-      background: var(--input-bg);
-      border: 1px solid var(--input-border);
-      color: var(--input-text);
-      padding: 12px;
-      border-radius: 10px;
-      font-size: 1.1rem;
-      text-align: center;
-      outline: none;
-    }
-
-    .pass-btn {
-      background: #3b82f6;
-      color: #fff;
-      border: none;
-      padding: 12px;
-      border-radius: 10px;
-      font-weight: 700;
-      cursor: pointer;
-    }
-
-    .calendar-nav {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      background: var(--card-bg);
-      border: 1px solid var(--card-border);
-      padding: 8px 12px;
-      border-radius: 10px;
-    }
-
-    .cal-btn {
-      background: none;
-      border: 1px solid var(--card-border);
-      color: var(--text-color);
-      width: 30px; height: 30px;
-      border-radius: 6px;
-      cursor: pointer;
-      font-weight: bold;
-    }
-
-    .cal-title { font-weight: 700; }
-
-    .cal-legend {
-      display: flex;
-      justify-content: space-around;
-      font-size: 0.75rem;
-      font-weight: 600;
-      background: var(--card-bg);
-      padding: 8px;
-      border-radius: 8px;
-      border: 1px solid var(--card-border);
-    }
-
-    .leg-item { display: flex; align-items: center; gap: 4px; }
-    .leg-dot { width: 10px; height: 10px; border-radius: 2px; }
-
-    .cal-grid {
-      display: grid;
-      grid-template-columns: repeat(7, 1fr);
-      gap: 6px;
-    }
-
-    .cal-weekday {
-      text-align: center;
-      font-size: 0.72rem;
-      font-weight: 700;
-      color: #94a3b8;
-    }
-
-    .cal-day {
-      aspect-ratio: 1;
-      background: var(--card-bg);
-      border: 1px solid var(--card-border);
-      border-radius: 8px;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: space-between;
-      padding: 4px;
-      cursor: pointer;
-      user-select: none;
-      transition: opacity 0.2s ease, filter 0.2s ease;
-    }
-
-    /* Стиль для прошедших дней */
-    .cal-day.past {
-      opacity: 0.4;
-      filter: grayscale(35%);
-      background: rgba(15, 23, 42, 0.3);
-    }
-
-    .cal-day.empty {
-      opacity: 0.1;
-      pointer-events: none;
-      border: none;
-      background: transparent;
-    }
-
-    .cal-day-num { font-size: 0.75rem; font-weight: 600; align-self: flex-start; }
-    .cal-day-badge { font-size: 0.7rem; font-weight: 800; line-height: 1; }
-
-    .cal-day.st-98 { background: var(--color-98-bg); color: var(--color-98-text); border-color: transparent; }
-    .cal-day.st-163 { background: var(--color-163-bg); color: var(--color-163-text); border-color: transparent; }
-    .cal-day.st-vh { background: var(--color-vh-bg); color: var(--color-vh-text); border-color: transparent; }
-
-    .shift-modal-card {
-      background: var(--modal-bg);
-      border: 1px solid var(--modal-border);
-      border-radius: 14px;
-      padding: 16px;
-      width: 280px;
-      display: flex;
-      flex-direction: column;
-      gap: 10px;
-    }
-
-    .shift-opt-btn {
-      padding: 10px;
-      border-radius: 8px;
-      border: none;
-      font-weight: 700;
-      color: #fff;
-      cursor: pointer;
-      display: flex;
-      justify-content: space-between;
-    }
-
-    .opt-98 { background: var(--color-98-bg); }
-    .opt-163 { background: var(--color-163-bg); color: var(--color-163-text); }
-    .opt-vh { background: var(--color-vh-bg); }
-    .opt-reset { background: transparent; border: 1px solid var(--card-border); color: #ef4444; }
-
-    .chat-modal {
-      height: 85vh;
-      max-height: 650px;
-    }
-
-    .chat-messages::-webkit-scrollbar, .sticker-picker::-webkit-scrollbar { width: 5px; }
-    .chat-messages::-webkit-scrollbar-thumb, .sticker-picker::-webkit-scrollbar-thumb { background: var(--status-btn-border); border-radius: 10px; }
-
-    .chat-messages {
-      flex: 1; padding: 18px; overflow-y: auto; display: flex; flex-direction: column; gap: 10px; background: var(--bg-color); overscroll-behavior: contain;
-    }
-
-    .chat-message {
-      position: relative; background: var(--chat-msg-other-bg); border: 1px solid var(--chat-msg-other-border); padding: 10px 14px; border-radius: 16px 16px 16px 4px; max-width: 80%; word-wrap: break-word; align-self: flex-start; box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
-    }
-
-    .chat-message.my-message {
-      align-self: flex-end; background: linear-gradient(135deg, #3b82f6, #2563eb); border: none; border-radius: 16px 16px 4px 16px;
-    }
-
-    .message-meta { display: flex; justify-content: space-between; align-items: center; gap: 12px; font-size: 0.72rem; margin-bottom: 4px; }
-    .message-sender { font-weight: 700; }
-    .chat-message.my-message .message-sender { color: #e0f2fe !important; }
-    .message-time { color: var(--status-btn-text); font-size: 0.68rem; }
-    .chat-message.my-message .message-time { color: rgba(255, 255, 255, 0.8); }
-    .message-text { font-size: 0.95rem; line-height: 1.4; color: var(--chat-msg-text); }
-    .chat-message.my-message .message-text { color: #ffffff; }
-
-    .chat-input-area { padding: 10px 14px; background: var(--header-bg); border-top: 1px solid var(--modal-border); display: flex; align-items: center; gap: 10px; }
-    .sticker-toggle-btn { background: var(--status-btn-bg); border: 1px solid var(--status-btn-border); font-size: 1.2rem; cursor: pointer; width: 40px; height: 40px; border-radius: 12px; display: flex; align-items: center; justify-content: center; }
-    .chat-input { flex: 1; background: var(--input-bg); border: 1px solid var(--input-border); color: var(--input-text); padding: 10px 16px; border-radius: 12px; font-size: 0.95rem; outline: none; }
-    .chat-send-btn { width: 42px; height: 40px; background: linear-gradient(135deg, #38bdf8, #0284c7); color: #ffffff; border: none; border-radius: 12px; display: flex; align-items: center; justify-content: center; cursor: pointer; }
-
-    .sticker-picker { background: var(--modal-bg); border-top: 1px solid var(--modal-border); padding: 12px 14px; display: none; flex-direction: column; gap: 10px; max-height: 260px; overflow-y: auto; }
-    .sticker-picker.active { display: flex; }
-    .sticker-grid { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 8px; }
-    .sticker-item { display: flex; align-items: center; justify-content: center; cursor: pointer; padding: 8px; background: var(--status-btn-bg); border: 1px solid var(--status-btn-border); border-radius: 12px; }
-    .sticker-item img { width: 40px; height: 40px; object-fit: contain; }
-
-    .chat-message.is-sticker { background: transparent !important; border: none !important; padding: 4px !important; box-shadow: none !important; }
-    .chat-message.is-sticker img.tg-sticker-img { width: 110px; height: 110px; object-fit: contain; display: block; }
-
-    .pending-body { padding: 20px; max-height: 70vh; overflow-y: auto; }
-    .pending-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(75px, 1fr)); gap: 10px; }
-    .pending-badge { background-color: var(--badge-bg); border: 1px solid var(--badge-border); color: #0284c7; font-weight: 700; font-size: 1.05rem; padding: 12px 8px; border-radius: 10px; text-align: center; }
-    [data-theme="dark"] .pending-badge { color: #38bdf8; }
-    .pending-empty { text-align: center; color: #22c55e; font-weight: 600; padding: 30px 10px; font-size: 1.1rem; }
-
-    /* ==========================================
-       ОТВЕТСТВЕННЫЕ ЗА ОТКРЫТИЕ
-       ========================================== */
-    .opening-responsibles-body {
-      padding: 14px;
-      max-height: 85vh;
-      overflow-y: auto;
-      display: flex;
-      flex-direction: column;
-      gap: 12px;
-    }
-
-    .opening-plan-header {
-      background: var(--card-bg);
-      border: 1px solid var(--card-border);
-      border-radius: 12px;
-      padding: 12px 14px;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 10px;
-    }
-
-    .opening-plan-title {
-      font-size: 0.95rem;
-      font-weight: 800;
-    }
-
-    .opening-plan-date {
-      margin-top: 2px;
-      font-size: 0.78rem;
-      color: var(--status-btn-text);
-      font-weight: 600;
-    }
-
-    .opening-plan-badge {
-      padding: 6px 8px;
-      border-radius: 8px;
-      background: rgba(34, 197, 94, 0.12);
-      color: #22c55e;
-      font-size: 0.68rem;
-      font-weight: 800;
-      white-space: nowrap;
-    }
-
-    .opening-info {
-      background: var(--card-bg);
-      border: 1px solid var(--card-border);
-      border-radius: 10px;
-      padding: 10px 12px;
-      font-size: 0.82rem;
-      color: var(--status-btn-text);
-      line-height: 1.4;
-    }
-
-    .opening-date-block {
-      background: var(--card-bg);
-      border: 1px solid var(--card-border);
-      border-radius: 12px;
-      padding: 10px;
-    }
-
-    .opening-date-title {
-      font-size: 0.88rem;
-      font-weight: 800;
-      margin-bottom: 8px;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      gap: 8px;
-    }
-
-    .opening-date-badge {
-      font-size: 0.72rem;
-      color: #38bdf8;
-      font-weight: 700;
-    }
-
-    .opening-branch {
-      border: 1px solid var(--card-border);
-      background: var(--input-bg);
-      border-radius: 10px;
-      padding: 10px;
-      margin-top: 8px;
-    }
-
-    .opening-branch-head {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 8px;
-    }
-
-    .opening-branch-name {
-      font-weight: 700;
-      font-size: 0.92rem;
-    }
-
-    .opening-add-btn {
-      width: 32px;
-      height: 32px;
-      border: 1px solid var(--input-border);
-      background: var(--status-btn-bg);
-      color: var(--text-color);
-      border-radius: 8px;
-      font-size: 1.25rem;
-      line-height: 1;
-      cursor: pointer;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      flex-shrink: 0;
-    }
-
-    .opening-add-btn:hover {
-      transform: scale(1.05);
-    }
-
-    .opening-contact {
-      margin-top: 8px;
-      padding: 9px;
-      border-radius: 9px;
-      border: 1px solid var(--card-border);
-      background: var(--card-bg);
-      display: flex;
-      align-items: center;
-      gap: 8px;
-    }
-
-    .opening-contact.assigned {
-      border-color: #22c55e;
-      background: rgba(34, 197, 94, 0.13);
-      box-shadow: 0 0 0 1px rgba(34, 197, 94, 0.16);
-    }
-
-    .opening-contact-choice {
-      width: 24px;
-      height: 24px;
-      border: 2px solid var(--input-border);
-      background: transparent;
-      border-radius: 50%;
-      flex-shrink: 0;
-      cursor: pointer;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      padding: 0;
-    }
-
-    .opening-contact-choice.selected {
-      border-color: #22c55e;
-      background: #22c55e;
-    }
-
-    .opening-choice-dot {
-      width: 8px;
-      height: 8px;
-      border-radius: 50%;
-      background: transparent;
-    }
-
-    .opening-contact-choice.selected .opening-choice-dot {
-      background: #fff;
-    }
-
-    .opening-contact-info {
-      flex: 1;
-      min-width: 0;
-    }
-
-    .opening-contact-name-row {
-      display: flex;
-      align-items: center;
-      gap: 6px;
-      min-width: 0;
-      flex-wrap: wrap;
-    }
-
-    .opening-tomorrow-label,
-    .opening-today-label {
-      font-size: 0.62rem;
-      font-weight: 800;
-      padding: 3px 5px;
-      border-radius: 5px;
-      white-space: nowrap;
-    }
-
-    .opening-tomorrow-label {
-      color: #fff;
-      background: #22c55e;
-    }
-
-    .opening-today-label {
-      color: #38bdf8;
-      background: rgba(56, 189, 248, 0.12);
-    }
-
-    .opening-contact-name {
-      font-weight: 700;
-      font-size: 0.88rem;
-      overflow: hidden;
-      text-overflow: ellipsis;
-      white-space: nowrap;
-    }
-
-    .opening-phone {
-      display: inline-block;
-      margin-top: 2px;
-      color: #38bdf8;
-      text-decoration: none;
-      font-size: 0.86rem;
-      font-weight: 600;
-    }
-
-    .opening-phone:hover {
-      text-decoration: underline;
-    }
-
-    .opening-contact-actions {
-      display: flex;
-      gap: 5px;
-      flex-shrink: 0;
-    }
-
-    .opening-mini-btn {
-      width: 30px;
-      height: 30px;
-      border: 1px solid var(--input-border);
-      background: var(--status-btn-bg);
-      color: var(--text-color);
-      border-radius: 7px;
-      cursor: pointer;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 0.85rem;
-    }
-
-    .opening-mini-btn.delete {
-      color: #ef4444;
-    }
-
-    .opening-empty {
-      color: var(--status-btn-text);
-      font-size: 0.78rem;
-      margin-top: 7px;
-      text-align: center;
-      padding: 4px;
-    }
-
-    .opening-no-assigned {
-      margin-top: 8px;
-      color: #f59e0b;
-      font-size: 0.75rem;
-      font-weight: 700;
-      text-align: center;
-    }
-
-    .opening-assign-hint {
-      margin-top: 8px;
-      color: #22c55e;
-      font-size: 0.75rem;
-      font-weight: 700;
-      text-align: center;
-    }
-
-    .opening-contact-form {
-      margin-top: 9px;
-      padding: 10px;
-      border: 1px solid var(--input-border);
-      border-radius: 9px;
-      background: var(--bg-color);
-      display: none;
-      flex-direction: column;
-      gap: 8px;
-    }
-
-    .opening-contact-form.active {
-      display: flex;
-    }
-
-    .opening-contact-form input {
-      width: 100%;
-      background: var(--input-bg);
-      color: var(--input-text);
-      border: 1px solid var(--input-border);
-      border-radius: 8px;
-      padding: 9px 10px;
-      outline: none;
-      font-size: 0.9rem;
-    }
-
-    .opening-form-actions {
-      display: flex;
-      gap: 7px;
-    }
-
-    .opening-form-btn {
-      flex: 1;
-      padding: 9px;
-      border-radius: 8px;
-      border: 1px solid var(--input-border);
-      cursor: pointer;
-      font-weight: 700;
-      background: var(--status-btn-bg);
-      color: var(--text-color);
-    }
-
-    .opening-form-btn.save {
-      background: #22c55e;
-      color: #fff;
-      border-color: #22c55e;
-    }
-
-    .opening-form-btn.cancel {
-      color: #ef4444;
-    }
-
-    .opening-loading {
-      text-align: center;
-      padding: 30px 10px;
-      color: var(--status-btn-text);
-    }
-
-    .opening-today-note {
-      font-size: 0.72rem;
-      color: var(--status-btn-text);
-      font-weight: 600;
-    }
-
-  </style>
-
-  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  
+  <!-- Мета-теги против кэширования старого кода браузером -->
+  <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+  <meta http-equiv="Pragma" content="no-cache">
+  <meta http-equiv="Expires" content="0">
+
+  <title>Отчет по закрытию отделений и График</title>
+
+  <style>
+    :root {
+      --bg-color: #0f172a;
+      --text-color: #f8fafc;
+      --header-bg: linear-gradient(135deg, #0f172a, #1e293b);
+      --header-border: #334155;
+      --card-bg: linear-gradient(135deg, #1e293b, #0f172a);
+      --card-border: #334155;
+      --card-hover-border: #475569;
+      --card-closed-bg: linear-gradient(135deg, #064e3b, #0f172a);
+      --card-closed-border: rgba(34, 197, 94, 0.4);
+      --input-bg: #1e293b;
+      --input-border: #334155;
+      --input-text: #f8fafc;
+      --status-btn-bg: rgba(51, 65, 85, 0.6);
+      --status-btn-text: #94a3b8;
+      --status-btn-border: #334155;
+      --status-btn-active-bg: linear-gradient(135deg, #22c55e, #16a34a);
+      --status-btn-active-text: #ffffff;
+      --status-btn-active-shadow: 0 0 14px rgba(34, 197, 94, 0.4);
+      --modal-bg: #0f172a;
+      --modal-border: #334155;
+      --modal-overlay: rgba(15, 23, 42, 0.8);
+      --badge-bg: #0f172a;
+      --badge-border: #334155;
+      --theme-btn-bg: #1e293b;
+      --theme-btn-border: #334155;
+      --theme-btn-color: #fbbf24;
+      --chat-msg-other-bg: #1e293b;
+      --chat-msg-other-border: rgba(255, 255, 255, 0.08);
+      --chat-msg-text: #f8fafc;
+
+      --color-98-bg: #1d4ed8;
+      --color-98-text: #ffffff;
+      --color-163-bg: #d97706;
+      --color-163-text: #ffffff;
+      --color-vh-bg: #15803d;
+      --color-vh-text: #ffffff;
+    }
+
+    [data-theme="light"] {
+      --bg-color: #f8fafc;
+      --text-color: #0f172a;
+      --header-bg: #ffffff;
+      --header-border: #e2e8f0;
+      --card-bg: #ffffff;
+      --card-border: #e2e8f0;
+      --card-hover-border: #cbd5e1;
+      --card-closed-bg: #f0fdf4;
+      --card-closed-border: #86efac;
+      --input-bg: #ffffff;
+      --input-border: #cbd5e1;
+      --input-text: #0f172a;
+      
+      --status-btn-bg: #f1f5f9;
+      --status-btn-text: #64748b;
+      --status-btn-border: #cbd5e1;
+      
+      --status-btn-active-bg: linear-gradient(135deg, #4ade80, #22c55e);
+      --status-btn-active-text: #ffffff;
+      --status-btn-active-shadow: 0 4px 12px rgba(34, 197, 94, 0.25);
+      
+      --modal-bg: #ffffff;
+      --modal-border: #e2e8f0;
+      --modal-overlay: rgba(15, 23, 42, 0.3);
+      --badge-bg: #ffffff;
+      --badge-border: #e2e8f0;
+      --theme-btn-bg: #f1f5f9;
+      --theme-btn-border: #cbd5e1;
+      --theme-btn-color: #4f46e5;
+      --chat-msg-other-bg: #f1f5f9;
+      --chat-msg-other-border: #e2e8f0;
+      --chat-msg-text: #0f172a;
+
+      --color-98-bg: #3b82f6;
+      --color-98-text: #ffffff;
+      --color-163-bg: #fef3c7;
+      --color-163-text: #78350f;
+      --color-vh-bg: #22c55e;
+      --color-vh-text: #ffffff;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    }
+
+    body {
+      background-color: var(--bg-color);
+      color: var(--text-color);
+      padding: 16px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      min-height: 100vh;
+      transition: background-color 0.3s ease, color 0.3s ease;
+    }
+
+    body.modal-open {
+      overflow: hidden !important;
+      touch-action: none;
+    }
+
+    .header {
+      background: var(--header-bg);
+      border: 1px solid var(--header-border);
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+      width: 100%;
+      max-width: 500px;
+      position: sticky;
+      top: 0;
+      padding: 12px 16px;
+      border-radius: 12px;
+      margin-bottom: 16px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      z-index: 10;
+      transition: all 0.3s ease;
+    }
+
+    .title {
+      font-size: 1.1rem;
+      font-weight: 700;
+    }
+
+    .header-controls {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .theme-toggle-btn, .icon-trigger-btn {
+      background: var(--theme-btn-bg);
+      border: 1px solid var(--theme-btn-border);
+      color: var(--text-color);
+      width: 38px;
+      height: 38px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+      flex-shrink: 0;
+    }
+
+    .theme-toggle-btn {
+      color: var(--theme-btn-color);
+    }
+
+    .theme-toggle-btn:hover, .icon-trigger-btn:hover {
+      transform: scale(1.08);
+    }
+
+    .chat-trigger-btn {
+      background: linear-gradient(135deg, #6366f1, #8b5cf6);
+      border: none;
+      color: #ffffff;
+      width: 38px;
+      height: 38px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      position: relative;
+      transition: all 0.2s ease;
+      box-shadow: 0 4px 12px rgba(139, 92, 246, 0.3);
+      flex-shrink: 0;
+    }
+
+    .chat-trigger-btn:hover {
+      background: linear-gradient(135deg, #4f46e5, #7c3aed);
+      transform: scale(1.08);
+    }
+
+    .chat-badge {
+      position: absolute;
+      top: -3px;
+      right: -3px;
+      background-color: #ef4444;
+      color: #fff;
+      font-size: 0.7rem;
+      font-weight: 700;
+      border-radius: 10px;
+      padding: 2px 6px;
+      display: none;
+      border: 2px solid var(--modal-bg);
+    }
+
+    .counter {
+      background: rgba(56, 189, 248, 0.12);
+      color: #0284c7;
+      border: 1px solid rgba(56, 189, 248, 0.4);
+      padding: 6px 10px;
+      border-radius: 20px;
+      font-weight: 700;
+      font-size: 0.85rem;
+      cursor: pointer;
+      user-select: none;
+      transition: all 0.2s ease;
+      white-space: nowrap;
+    }
+
+    [data-theme="dark"] .counter {
+      color: #38bdf8;
+      border-color: rgba(56, 189, 248, 0.3);
+    }
+
+    .counter:hover {
+      background: #0284c7;
+      color: #ffffff;
+      border-color: #38bdf8;
+    }
+
+    .search-container {
+      width: 100%;
+      max-width: 500px;
+      margin-bottom: 16px;
+      position: relative;
+    }
+
+    .search-input {
+      width: 100%;
+      background-color: var(--input-bg);
+      border: 1px solid var(--input-border);
+      color: var(--input-text);
+      padding: 12px 40px 12px 16px;
+      border-radius: 10px;
+      font-size: 1rem;
+      outline: none;
+      transition: border-color 0.2s, background-color 0.3s ease;
+    }
+
+    .search-input:focus {
+      border-color: #38bdf8;
+    }
+
+    .clear-search-btn {
+      position: absolute;
+      right: 12px;
+      top: 50%;
+      transform: translateY(-50%);
+      background: none;
+      border: none;
+      color: #94a3b8;
+      font-size: 1.2rem;
+      cursor: pointer;
+      display: none;
+      padding: 4px;
+    }
+
+    .grid {
+      width: 100%;
+      max-width: 500px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      margin-bottom: 30px;
+    }
+
+    .card {
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      border-radius: 12px;
+      padding: 12px 16px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.03);
+    }
+
+    .card:hover {
+      border-color: var(--card-hover-border);
+      transform: translateY(-1px);
+    }
+
+    .card.is-closed {
+      border-color: var(--card-closed-border);
+      background: var(--card-closed-bg);
+    }
+
+    .branch-name {
+      font-weight: 600;
+      font-size: 1rem;
+      color: var(--text-color);
+      letter-spacing: 0.3px;
+    }
+
+    .status-btn {
+      background-color: var(--status-btn-bg);
+      color: var(--status-btn-text);
+      border: 1px solid var(--status-btn-border);
+      padding: 10px 16px;
+      border-radius: 8px;
+      font-weight: 600;
+      font-size: 0.88rem;
+      cursor: pointer;
+      outline: none;
+      transition: all 0.2s ease;
+      min-width: 115px;
+      text-align: center;
+      touch-action: manipulation;
+    }
+
+    .status-btn:hover {
+      filter: brightness(0.95);
+    }
+
+    .status-btn.active {
+      background: var(--status-btn-active-bg);
+      color: var(--status-btn-active-text);
+      border-color: #22c55e;
+      font-weight: 700;
+      box-shadow: var(--status-btn-active-shadow);
+    }
+
+    .status-btn.active:hover {
+      filter: brightness(1.05);
+      transform: scale(1.02);
+    }
+
+    .no-results {
+      text-align: center;
+      color: #94a3b8;
+      padding: 20px;
+      font-size: 0.95rem;
+    }
+
+    .footer {
+      width: 100%;
+      max-width: 500px;
+      text-align: center;
+      margin-top: auto;
+      bottom: 5px;
+      padding-bottom: 5px;
+      position: sticky;
+      padding-top: 10px;
+    }
+
+    .reset-btn {
+      background-color: var(--bg-color);
+      color: #ef4444;
+      border: 1px solid #ef4444;
+      padding: 10px 20px;
+      border-radius: 8px;
+      font-weight: 600;
+      cursor: pointer;
+      width: 100%;
+      transition: background-color 0.2s ease;
+    }
+
+    .reset-btn:active {
+      background-color: rgba(239, 68, 68, 0.1);
+    }
+
+    .modal-overlay {
+      position: fixed;
+      top: 0; left: 0; width: 100%; height: 100%;
+      background: var(--modal-overlay);
+      backdrop-filter: blur(4px);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      z-index: 100;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.2s ease;
+      padding: 16px;
+      overscroll-behavior: contain;
+    }
+
+    .modal-overlay.active {
+      opacity: 1;
+      pointer-events: auto;
+    }
+
+    .modal-card {
+      border: 1px solid var(--modal-border);
+      border-radius: 16px;
+      width: 100%;
+      max-width: 480px;
+      display: flex;
+      flex-direction: column;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+      overflow: hidden;
+      background-color: var(--modal-bg);
+      color: var(--text-color);
+    }
+
+    .modal-header {
+      padding: 12px 16px;
+      background-color: var(--header-bg);
+      border-bottom: 1px solid var(--modal-border);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .modal-header-title {
+      font-weight: 600;
+      font-size: 1rem;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .modal-close-btn {
+      background: none;
+      border: none;
+      color: #94a3b8;
+      font-size: 1.4rem;
+      cursor: pointer;
+      padding: 4px;
+      line-height: 1;
+    }
+
+    .calendar-modal-body {
+      padding: 16px;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      max-height: 85vh;
+      overflow-y: auto;
+    }
+
+    .auth-block {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      text-align: center;
+      padding: 20px 10px;
+    }
+
+    .pass-input {
+      background: var(--input-bg);
+      border: 1px solid var(--input-border);
+      color: var(--input-text);
+      padding: 12px;
+      border-radius: 10px;
+      font-size: 1.1rem;
+      text-align: center;
+      outline: none;
+    }
+
+    .pass-btn {
+      background: #3b82f6;
+      color: #fff;
+      border: none;
+      padding: 12px;
+      border-radius: 10px;
+      font-weight: 700;
+      cursor: pointer;
+    }
+
+    .calendar-nav {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      padding: 8px 12px;
+      border-radius: 10px;
+    }
+
+    .cal-btn {
+      background: none;
+      border: 1px solid var(--card-border);
+      color: var(--text-color);
+      width: 30px; height: 30px;
+      border-radius: 6px;
+      cursor: pointer;
+      font-weight: bold;
+    }
+
+    .cal-title { font-weight: 700; }
+
+    .cal-legend {
+      display: flex;
+      justify-content: space-around;
+      font-size: 0.75rem;
+      font-weight: 600;
+      background: var(--card-bg);
+      padding: 8px;
+      border-radius: 8px;
+      border: 1px solid var(--card-border);
+    }
+
+    .leg-item { display: flex; align-items: center; gap: 4px; }
+    .leg-dot { width: 10px; height: 10px; border-radius: 2px; }
+
+    .cal-grid {
+      display: grid;
+      grid-template-columns: repeat(7, 1fr);
+      gap: 6px;
+    }
+
+    .cal-weekday {
+      text-align: center;
+      font-size: 0.72rem;
+      font-weight: 700;
+      color: #94a3b8;
+    }
+
+    .cal-day {
+      aspect-ratio: 1;
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      border-radius: 8px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: space-between;
+      padding: 4px;
+      cursor: pointer;
+      user-select: none;
+      transition: opacity 0.2s ease, filter 0.2s ease;
+    }
+
+    /* Стиль для прошедших дней */
+    .cal-day.past {
+      opacity: 0.4;
+      filter: grayscale(35%);
+      background: rgba(15, 23, 42, 0.3);
+    }
+
+    .cal-day.empty {
+      opacity: 0.1;
+      pointer-events: none;
+      border: none;
+      background: transparent;
+    }
+
+    .cal-day-num { font-size: 0.75rem; font-weight: 600; align-self: flex-start; }
+    .cal-day-badge { font-size: 0.7rem; font-weight: 800; line-height: 1; }
+
+    .cal-day.st-98 { background: var(--color-98-bg); color: var(--color-98-text); border-color: transparent; }
+    .cal-day.st-163 { background: var(--color-163-bg); color: var(--color-163-text); border-color: transparent; }
+    .cal-day.st-vh { background: var(--color-vh-bg); color: var(--color-vh-text); border-color: transparent; }
+
+    .shift-modal-card {
+      background: var(--modal-bg);
+      border: 1px solid var(--modal-border);
+      border-radius: 14px;
+      padding: 16px;
+      width: 280px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .shift-opt-btn {
+      padding: 10px;
+      border-radius: 8px;
+      border: none;
+      font-weight: 700;
+      color: #fff;
+      cursor: pointer;
+      display: flex;
+      justify-content: space-between;
+    }
+
+    .opt-98 { background: var(--color-98-bg); }
+    .opt-163 { background: var(--color-163-bg); color: var(--color-163-text); }
+    .opt-vh { background: var(--color-vh-bg); }
+    .opt-reset { background: transparent; border: 1px solid var(--card-border); color: #ef4444; }
+
+    .chat-modal {
+      height: 85vh;
+      max-height: 650px;
+    }
+
+    .chat-messages::-webkit-scrollbar, .sticker-picker::-webkit-scrollbar { width: 5px; }
+    .chat-messages::-webkit-scrollbar-thumb, .sticker-picker::-webkit-scrollbar-thumb { background: var(--status-btn-border); border-radius: 10px; }
+
+    .chat-messages {
+      flex: 1; padding: 18px; overflow-y: auto; display: flex; flex-direction: column; gap: 10px; background: var(--bg-color); overscroll-behavior: contain;
+    }
+
+    .chat-message {
+      position: relative; background: var(--chat-msg-other-bg); border: 1px solid var(--chat-msg-other-border); padding: 10px 14px; border-radius: 16px 16px 16px 4px; max-width: 80%; word-wrap: break-word; align-self: flex-start; box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+    }
+
+    .chat-message.my-message {
+      align-self: flex-end; background: linear-gradient(135deg, #3b82f6, #2563eb); border: none; border-radius: 16px 16px 4px 16px;
+    }
+
+    .message-meta { display: flex; justify-content: space-between; align-items: center; gap: 12px; font-size: 0.72rem; margin-bottom: 4px; }
+    .message-sender { font-weight: 700; }
+    .chat-message.my-message .message-sender { color: #e0f2fe !important; }
+    .message-time { color: var(--status-btn-text); font-size: 0.68rem; }
+    .chat-message.my-message .message-time { color: rgba(255, 255, 255, 0.8); }
+    .message-text { font-size: 0.95rem; line-height: 1.4; color: var(--chat-msg-text); }
+    .chat-message.my-message .message-text { color: #ffffff; }
+
+    .chat-input-area { padding: 10px 14px; background: var(--header-bg); border-top: 1px solid var(--modal-border); display: flex; align-items: center; gap: 10px; }
+    .sticker-toggle-btn { background: var(--status-btn-bg); border: 1px solid var(--status-btn-border); font-size: 1.2rem; cursor: pointer; width: 40px; height: 40px; border-radius: 12px; display: flex; align-items: center; justify-content: center; }
+    .chat-input { flex: 1; background: var(--input-bg); border: 1px solid var(--input-border); color: var(--input-text); padding: 10px 16px; border-radius: 12px; font-size: 0.95rem; outline: none; }
+    .chat-send-btn { width: 42px; height: 40px; background: linear-gradient(135deg, #38bdf8, #0284c7); color: #ffffff; border: none; border-radius: 12px; display: flex; align-items: center; justify-content: center; cursor: pointer; }
+
+    .sticker-picker { background: var(--modal-bg); border-top: 1px solid var(--modal-border); padding: 12px 14px; display: none; flex-direction: column; gap: 10px; max-height: 260px; overflow-y: auto; }
+    .sticker-picker.active { display: flex; }
+    .sticker-grid { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 8px; }
+    .sticker-item { display: flex; align-items: center; justify-content: center; cursor: pointer; padding: 8px; background: var(--status-btn-bg); border: 1px solid var(--status-btn-border); border-radius: 12px; }
+    .sticker-item img { width: 40px; height: 40px; object-fit: contain; }
+
+    .chat-message.is-sticker { background: transparent !important; border: none !important; padding: 4px !important; box-shadow: none !important; }
+    .chat-message.is-sticker img.tg-sticker-img { width: 110px; height: 110px; object-fit: contain; display: block; }
+
+    .pending-body { padding: 20px; max-height: 70vh; overflow-y: auto; }
+    .pending-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(75px, 1fr)); gap: 10px; }
+    .pending-badge { background-color: var(--badge-bg); border: 1px solid var(--badge-border); color: #0284c7; font-weight: 700; font-size: 1.05rem; padding: 12px 8px; border-radius: 10px; text-align: center; }
+    [data-theme="dark"] .pending-badge { color: #38bdf8; }
+    .pending-empty { text-align: center; color: #22c55e; font-weight: 600; padding: 30px 10px; font-size: 1.1rem; }
+
+    /* ==========================================
+       ОТВЕТСТВЕННЫЕ ЗА ОТКРЫТИЕ
+       ========================================== */
+    .opening-responsibles-body {
+      padding: 14px;
+      max-height: 85vh;
+      overflow-y: auto;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .opening-plan-header {
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      border-radius: 12px;
+      padding: 12px 14px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+    }
+
+    .opening-plan-title {
+      font-size: 0.95rem;
+      font-weight: 800;
+    }
+
+    .opening-plan-date {
+      margin-top: 2px;
+      font-size: 0.78rem;
+      color: var(--status-btn-text);
+      font-weight: 600;
+    }
+
+    .opening-plan-badge {
+      padding: 6px 8px;
+      border-radius: 8px;
+      background: rgba(34, 197, 94, 0.12);
+      color: #22c55e;
+      font-size: 0.68rem;
+      font-weight: 800;
+      white-space: nowrap;
+    }
+
+    .opening-info {
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      border-radius: 10px;
+      padding: 10px 12px;
+      font-size: 0.82rem;
+      color: var(--status-btn-text);
+      line-height: 1.4;
+    }
+
+    .opening-date-block {
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      border-radius: 12px;
+      padding: 10px;
+    }
+
+    .opening-date-title {
+      font-size: 0.88rem;
+      font-weight: 800;
+      margin-bottom: 8px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .opening-date-badge {
+      font-size: 0.72rem;
+      color: #38bdf8;
+      font-weight: 700;
+    }
+
+    .opening-branch {
+      border: 1px solid var(--card-border);
+      background: var(--input-bg);
+      border-radius: 10px;
+      padding: 10px;
+      margin-top: 8px;
+    }
+
+    .opening-branch-head {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+    }
+
+    .opening-branch-name {
+      font-weight: 700;
+      font-size: 0.92rem;
+    }
+
+    .opening-add-btn {
+      width: 32px;
+      height: 32px;
+      border: 1px solid var(--input-border);
+      background: var(--status-btn-bg);
+      color: var(--text-color);
+      border-radius: 8px;
+      font-size: 1.25rem;
+      line-height: 1;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+
+    .opening-add-btn:hover {
+      transform: scale(1.05);
+    }
+
+    .opening-contact {
+      margin-top: 8px;
+      padding: 9px;
+      border-radius: 9px;
+      border: 1px solid var(--card-border);
+      background: var(--card-bg);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .opening-contact.assigned {
+      border-color: #22c55e;
+      background: rgba(34, 197, 94, 0.13);
+      box-shadow: 0 0 0 1px rgba(34, 197, 94, 0.16);
+    }
+
+    .opening-contact-choice {
+      width: 24px;
+      height: 24px;
+      border: 2px solid var(--input-border);
+      background: transparent;
+      border-radius: 50%;
+      flex-shrink: 0;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 0;
+    }
+
+    .opening-contact-choice.selected {
+      border-color: #22c55e;
+      background: #22c55e;
+    }
+
+    .opening-choice-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: transparent;
+    }
+
+    .opening-contact-choice.selected .opening-choice-dot {
+      background: #fff;
+    }
+
+    .opening-contact-info {
+      flex: 1;
+      min-width: 0;
+    }
+
+    .opening-contact-name-row {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      min-width: 0;
+      flex-wrap: wrap;
+    }
+
+    .opening-tomorrow-label,
+    .opening-today-label {
+      font-size: 0.62rem;
+      font-weight: 800;
+      padding: 3px 5px;
+      border-radius: 5px;
+      white-space: nowrap;
+    }
+
+    .opening-tomorrow-label {
+      color: #fff;
+      background: #22c55e;
+    }
+
+    .opening-today-label {
+      color: #38bdf8;
+      background: rgba(56, 189, 248, 0.12);
+    }
+
+    .opening-contact-name {
+      font-weight: 700;
+      font-size: 0.88rem;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    .opening-phone {
+      display: inline-block;
+      margin-top: 2px;
+      color: #38bdf8;
+      text-decoration: none;
+      font-size: 0.86rem;
+      font-weight: 600;
+    }
+
+    .opening-phone:hover {
+      text-decoration: underline;
+    }
+
+    .opening-contact-actions {
+      display: flex;
+      gap: 5px;
+      flex-shrink: 0;
+    }
+
+    .opening-mini-btn {
+      width: 30px;
+      height: 30px;
+      border: 1px solid var(--input-border);
+      background: var(--status-btn-bg);
+      color: var(--text-color);
+      border-radius: 7px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.85rem;
+    }
+
+    .opening-mini-btn.delete {
+      color: #ef4444;
+    }
+
+    .opening-empty {
+      color: var(--status-btn-text);
+      font-size: 0.78rem;
+      margin-top: 7px;
+      text-align: center;
+      padding: 4px;
+    }
+
+    .opening-no-assigned {
+      margin-top: 8px;
+      color: #f59e0b;
+      font-size: 0.75rem;
+      font-weight: 700;
+      text-align: center;
+    }
+
+    .opening-assign-hint {
+      margin-top: 8px;
+      color: #22c55e;
+      font-size: 0.75rem;
+      font-weight: 700;
+      text-align: center;
+    }
+
+    .opening-contact-form {
+      margin-top: 9px;
+      padding: 10px;
+      border: 1px solid var(--input-border);
+      border-radius: 9px;
+      background: var(--bg-color);
+      display: none;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .opening-contact-form.active {
+      display: flex;
+    }
+
+    .opening-contact-form input {
+      width: 100%;
+      background: var(--input-bg);
+      color: var(--input-text);
+      border: 1px solid var(--input-border);
+      border-radius: 8px;
+      padding: 9px 10px;
+      outline: none;
+      font-size: 0.9rem;
+    }
+
+    .opening-form-actions {
+      display: flex;
+      gap: 7px;
+    }
+
+    .opening-form-btn {
+      flex: 1;
+      padding: 9px;
+      border-radius: 8px;
+      border: 1px solid var(--input-border);
+      cursor: pointer;
+      font-weight: 700;
+      background: var(--status-btn-bg);
+      color: var(--text-color);
+    }
+
+    .opening-form-btn.save {
+      background: #22c55e;
+      color: #fff;
+      border-color: #22c55e;
+    }
+
+    .opening-form-btn.cancel {
+      color: #ef4444;
+    }
+
+    .opening-loading {
+      text-align: center;
+      padding: 30px 10px;
+      color: var(--status-btn-text);
+    }
+
+    .opening-today-note {
+      font-size: 0.72rem;
+      color: var(--status-btn-text);
+      font-weight: 600;
+    }
+
+  </style>
+
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
 </head>
 <body>
 
-  <div class="header">
-    <div class="title">КЗ</div>
-    <div class="header-controls">
-      <button class="icon-trigger-btn" onclick="openScheduleModal()" title="График работы (Пароль)">
-        <svg width="64" height="64" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
-          <defs>
-            <linearGradient id="calHeaderGrad" x1="8" y1="12" x2="56" y2="28" gradientUnits="userSpaceOnUse">
-              <stop offset="0%" stop-color="#3B82F6"/>
-              <stop offset="100%" stop-color="#2563EB"/>
-            </linearGradient>
+  <div class="header">
+    <div class="title">КЗ</div>
+    <div class="header-controls">
+      <button class="icon-trigger-btn" onclick="openScheduleModal()" title="График работы (Пароль)">
+        <svg width="64" height="64" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <defs>
+            <linearGradient id="calHeaderGrad" x1="8" y1="12" x2="56" y2="28" gradientUnits="userSpaceOnUse">
+              <stop offset="0%" stop-color="#3B82F6"/>
+              <stop offset="100%" stop-color="#2563EB"/>
+            </linearGradient>
 
-            <linearGradient id="calBodyGrad" x1="8" y1="26" x2="56" y2="54" gradientUnits="userSpaceOnUse">
-              <stop offset="0%" stop-color="#1E293B"/>
-              <stop offset="100%" stop-color="#0F172A"/>
-            </linearGradient>
+            <linearGradient id="calBodyGrad" x1="8" y1="26" x2="56" y2="54" gradientUnits="userSpaceOnUse">
+              <stop offset="0%" stop-color="#1E293B"/>
+              <stop offset="100%" stop-color="#0F172A"/>
+            </linearGradient>
 
-            <filter id="shadow" x="2" y="8" width="60" height="52" filterUnits="userSpaceOnUse" color-interpolation-filters="sRGB">
-              <feDropShadow dx="0" dy="6" stdDeviation="4" flood-color="#000000" flood-opacity="0.35"/>
-            </filter>
-          </defs>
+            <filter id="shadow" x="2" y="8" width="60" height="52" filterUnits="userSpaceOnUse" color-interpolation-filters="sRGB">
+              <feDropShadow dx="0" dy="6" stdDeviation="4" flood-color="#000000" flood-opacity="0.35"/>
+            </filter>
+          </defs>
 
-          <g filter="url(#shadow)">
-            <rect x="8" y="24" width="48" height="30" rx="10" fill="url(#calBodyGrad)" stroke="#334155" stroke-width="1.5"/>
-            <path d="M8 22C8 16.4772 12.4772 12 18 12H46C51.5228 12 56 16.4772 56 22V26H8V22Z" fill="url(#calHeaderGrad)"/>
-            <rect x="18" y="8" width="4" height="8" rx="2" fill="#93C5FD"/>
-            <rect x="42" y="8" width="4" height="8" rx="2" fill="#93C5FD"/>
-            <circle cx="18" cy="33" r="2.2" fill="#64748B"/>
-            <circle cx="27" cy="33" r="2.2" fill="#64748B"/>
-            <circle cx="36" cy="33" r="2.2" fill="#64748B"/>
-            <circle cx="45" cy="33" r="2.2" fill="#64748B"/>
-            <circle cx="18" cy="42" r="2.2" fill="#64748B"/>
-            <rect x="23" y="38" width="8" height="8" rx="3" fill="#EF4444"/>
-            <circle cx="36" cy="42" r="2.2" fill="#64748B"/>
-            <circle cx="45" cy="42" r="2.2" fill="#64748B"/>
-          </g>
-        </svg>
-      </button>
-
-
-      <button class="icon-trigger-btn" onclick="openOpeningResponsiblesModal()" title="Ответственные за открытие" aria-label="Ответственные за открытие">
-        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-          <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"></path>
-          <circle cx="9" cy="7" r="4"></circle>
-          <path d="M19 8v6"></path>
-          <path d="M22 11h-6"></path>
-        </svg>
-      </button>
-
-      <button class="theme-toggle-btn" id="themeToggleBtn" onclick="toggleTheme()" title="Сменить тему">
-        <svg id="sunIcon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-          <circle cx="12" cy="12" r="5"></circle><line x1="12" y1="1" x2="12" y2="3"></line><line x1="12" y1="21" x2="12" y2="23"></line><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line><line x1="1" y1="12" x2="3" y2="12"></line><line x1="21" y1="12" x2="23" y2="12"></line><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
-        </svg>
-        <svg id="moonIcon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display: none;">
-          <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
-        </svg>
-      </button>
-
-      <button class="chat-trigger-btn" id="openChatBtn" onclick="openChat()" title="Открыть анонимный чат">
-        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-          <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
-        </svg>
-        <span class="chat-badge" id="chatBadge">0</span>
-      </button>
-      <div class="counter" id="counter" onclick="openPendingModal()" title="Нажмите, чтобы увидеть незакрытые">0 / 20</div>
-    </div>
-  </div>
-
-  <div class="search-container">
-    <input type="number" id="searchInput" class="search-input" placeholder="Введите № отделения...">
-    <button class="clear-search-btn" id="clearSearchBtn" onclick="clearSearch()">✕</button>
-  </div>
-
-  <div class="grid" id="branchesGrid"></div>
-
-  <div class="footer">
-    <button class="reset-btn" id="resetBtn" onclick="resetAll()">Сбросить всё</button>
-  </div>
-
-  <!-- Модальное окно календаря -->
-  <div class="modal-overlay" id="scheduleModalOverlay" onclick="handleOverlayClick(event, 'schedule')">
-    <div class="modal-card">
-      <div class="modal-header">
-        <div class="modal-header-title"><span>График работы</span></div>
-        <button class="modal-close-btn" onclick="closeScheduleModal()">✕</button>
-      </div>
-      <div class="calendar-modal-body">
-        
-        <div class="auth-block" id="calAuthBlock">
-          <div>🔒 Вход защищен паролем</div>
-          <input type="password" id="calPassInput" class="pass-input" placeholder="Пароль доступа" maxlength="10">
-          <button class="pass-btn" onclick="verifyCalPass()">Войти</button>
-        </div>
-
-        <div id="calContentBlock" style="display: none; flex-direction: column; gap: 12px;">
-          <div class="calendar-nav">
-            <button class="cal-btn" onclick="changeCalMonth(-1)">←</button>
-            <div class="cal-title" id="calMonthTitle">Август 2026</div>
-            <button class="cal-btn" onclick="changeCalMonth(1)">→</button>
-          </div>
-
-          <div class="cal-legend">
-            <div class="leg-item"><div class="leg-dot" style="background:var(--color-98-bg)"></div> 98 отд.</div>
-            <div class="leg-item"><div class="leg-dot" style="background:var(--color-163-bg)"></div> 163 отд.</div>
-            <div class="leg-item"><div class="leg-dot" style="background:var(--color-vh-bg)"></div> ВХ</div>
-          </div>
-
-          <div class="cal-grid" id="calGrid"></div>
-        </div>
-
-      </div>
-    </div>
-  </div>
+          <g filter="url(#shadow)">
+            <rect x="8" y="24" width="48" height="30" rx="10" fill="url(#calBodyGrad)" stroke="#334155" stroke-width="1.5"/>
+            <path d="M8 22C8 16.4772 12.4772 12 18 12H46C51.5228 12 56 16.4772 56 22V26H8V22Z" fill="url(#calHeaderGrad)"/>
+            <rect x="18" y="8" width="4" height="8" rx="2" fill="#93C5FD"/>
+            <rect x="42" y="8" width="4" height="8" rx="2" fill="#93C5FD"/>
+            <circle cx="18" cy="33" r="2.2" fill="#64748B"/>
+            <circle cx="27" cy="33" r="2.2" fill="#64748B"/>
+            <circle cx="36" cy="33" r="2.2" fill="#64748B"/>
+            <circle cx="45" cy="33" r="2.2" fill="#64748B"/>
+            <circle cx="18" cy="42" r="2.2" fill="#64748B"/>
+            <rect x="23" y="38" width="8" height="8" rx="3" fill="#EF4444"/>
+            <circle cx="36" cy="42" r="2.2" fill="#64748B"/>
+            <circle cx="45" cy="42" r="2.2" fill="#64748B"/>
+          </g>
+        </svg>
+      </button>
 
 
-  <!-- Модальное окно ответственных за открытие -->
-  <div class="modal-overlay" id="openingResponsiblesModalOverlay" onclick="handleOverlayClick(event, 'openingResponsibles')">
+      <button class="icon-trigger-btn" onclick="openOpeningResponsiblesModal()" title="Ответственные за открытие" aria-label="Ответственные за открытие">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"></path>
+          <circle cx="9" cy="7" r="4"></circle>
+          <path d="M19 8v6"></path>
+          <path d="M22 11h-6"></path>
+        </svg>
+      </button>
+
+      <button class="theme-toggle-btn" id="themeToggleBtn" onclick="toggleTheme()" title="Сменить тему">
+        <svg id="sunIcon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="12" cy="12" r="5"></circle><line x1="12" y1="1" x2="12" y2="3"></line><line x1="12" y1="21" x2="12" y2="23"></line><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line><line x1="1" y1="12" x2="3" y2="12"></line><line x1="21" y1="12" x2="23" y2="12"></line><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+        </svg>
+        <svg id="moonIcon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display: none;">
+          <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+        </svg>
+      </button>
+
+      <button class="chat-trigger-btn" id="openChatBtn" onclick="openChat()" title="Открыть анонимный чат">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
+        </svg>
+        <span class="chat-badge" id="chatBadge">0</span>
+      </button>
+      <div class="counter" id="counter" onclick="openPendingModal()" title="Нажмите, чтобы увидеть незакрытые">0 / 20</div>
+    </div>
+  </div>
+
+  <div class="search-container">
+    <input type="number" id="searchInput" class="search-input" placeholder="Введите № отделения...">
+    <button class="clear-search-btn" id="clearSearchBtn" onclick="clearSearch()">✕</button>
+  </div>
+
+  <div class="grid" id="branchesGrid"></div>
+
+  <div class="footer">
+    <button class="reset-btn" id="resetBtn" onclick="resetAll()">Сбросить всё</button>
+  </div>
+
+  <!-- Модальное окно календаря -->
+  <div class="modal-overlay" id="scheduleModalOverlay" onclick="handleOverlayClick(event, 'schedule')">
+    <div class="modal-card">
+      <div class="modal-header">
+        <div class="modal-header-title"><span>График работы</span></div>
+        <button class="modal-close-btn" onclick="closeScheduleModal()">✕</button>
+      </div>
+      <div class="calendar-modal-body">
+        
+        <div class="auth-block" id="calAuthBlock">
+          <div>🔒 Вход защищен паролем</div>
+          <input type="password" id="calPassInput" class="pass-input" placeholder="Пароль доступа" maxlength="10">
+          <button class="pass-btn" onclick="verifyCalPass()">Войти</button>
+        </div>
+
+        <div id="calContentBlock" style="display: none; flex-direction: column; gap: 12px;">
+          <div class="calendar-nav">
+            <button class="cal-btn" onclick="changeCalMonth(-1)">←</button>
+            <div class="cal-title" id="calMonthTitle">Август 2026</div>
+            <button class="cal-btn" onclick="changeCalMonth(1)">→</button>
+          </div>
+
+          <div class="cal-legend">
+            <div class="leg-item"><div class="leg-dot" style="background:var(--color-98-bg)"></div> 98 отд.</div>
+            <div class="leg-item"><div class="leg-dot" style="background:var(--color-163-bg)"></div> 163 отд.</div>
+            <div class="leg-item"><div class="leg-dot" style="background:var(--color-vh-bg)"></div> ВХ</div>
+          </div>
+
+          <div class="cal-grid" id="calGrid"></div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+
+  <!-- Модальное окно ответственных за открытие -->
+  <div class="modal-overlay" id="openingResponsiblesModalOverlay" onclick="handleOverlayClick(event, 'openingResponsibles')">
     <div class="modal-card">
       <div class="modal-header">
         <div class="modal-header-title"><span>📞 Ответственные за открытие</span></div>
