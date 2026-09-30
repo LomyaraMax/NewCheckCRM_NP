@@ -949,6 +949,116 @@
       color: #ef4444;
     }
 
+    .opening-wakeup-bar {
+      margin-top: 9px;
+      padding-top: 9px;
+      border-top: 1px solid var(--card-border);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+
+    .opening-wakeup-btn {
+      border: 1px solid #22c55e;
+      background: rgba(34, 197, 94, 0.10);
+      color: #22c55e;
+      border-radius: 8px;
+      padding: 7px 10px;
+      font-size: 0.75rem;
+      font-weight: 800;
+      cursor: pointer;
+    }
+
+    .opening-wakeup-btn.active {
+      background: #22c55e;
+      color: #fff;
+    }
+
+    .opening-wakeup-btn:disabled {
+      opacity: 0.8;
+      cursor: default;
+    }
+
+    .opening-wakeup-time {
+      color: #22c55e;
+      font-size: 0.72rem;
+      font-weight: 800;
+    }
+
+    .opening-wakeup-history {
+      margin-top: 7px;
+      padding: 7px 9px;
+      border-radius: 8px;
+      background: rgba(56, 189, 248, 0.08);
+      color: var(--status-btn-text);
+      font-size: 0.7rem;
+      line-height: 1.45;
+    }
+
+    .opening-wakeup-history-title {
+      font-weight: 800;
+      color: #38bdf8;
+      margin-bottom: 3px;
+    }
+
+    .opening-day-actions {
+      display: flex;
+      gap: 7px;
+      flex-wrap: wrap;
+    }
+
+    .opening-reset-wakeup-btn,
+    .opening-history-btn {
+      border: 1px solid var(--input-border);
+      background: var(--status-btn-bg);
+      color: var(--text-color);
+      border-radius: 8px;
+      padding: 7px 9px;
+      font-size: 0.7rem;
+      font-weight: 800;
+      cursor: pointer;
+    }
+
+    .opening-reset-wakeup-btn {
+      color: #f59e0b;
+      border-color: rgba(245, 158, 11, 0.45);
+    }
+
+    .opening-history-panel {
+      margin-top: 8px;
+      padding: 9px;
+      border-radius: 9px;
+      border: 1px solid var(--card-border);
+      background: var(--card-bg);
+      display: none;
+    }
+
+    .opening-history-panel.active {
+      display: block;
+    }
+
+    .opening-history-row {
+      display: flex;
+      justify-content: space-between;
+      gap: 8px;
+      padding: 5px 0;
+      border-bottom: 1px solid var(--card-border);
+      font-size: 0.72rem;
+    }
+
+    .opening-history-row:last-child {
+      border-bottom: 0;
+    }
+
+    .opening-history-empty {
+      color: var(--status-btn-text);
+      font-size: 0.72rem;
+      text-align: center;
+      padding: 4px;
+    }
+
     .opening-loading {
       text-align: center;
       padding: 30px 10px;
@@ -959,6 +1069,146 @@
       font-size: 0.72rem;
       color: var(--status-btn-text);
       font-weight: 600;
+    }
+
+    .opening-instructions-toggle {
+      width: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+      border: 1px solid var(--card-border);
+      background: var(--card-bg);
+      color: var(--status-btn-text);
+      border-radius: 9px;
+      padding: 7px 10px;
+      font-size: 0.72rem;
+      font-weight: 800;
+      cursor: pointer;
+      text-align: left;
+    }
+
+    .opening-instructions {
+      display: none;
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      border-radius: 10px;
+      padding: 10px 12px;
+      font-size: 0.78rem;
+      color: var(--status-btn-text);
+      line-height: 1.45;
+    }
+
+    .opening-instructions.active {
+      display: block;
+    }
+
+    .opening-dashboard {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px;
+    }
+
+    .opening-dashboard-card {
+      border: 1px solid var(--card-border);
+      background: var(--card-bg);
+      border-radius: 11px;
+      padding: 10px;
+      cursor: pointer;
+      text-align: left;
+      transition: transform .15s ease, border-color .15s ease, box-shadow .15s ease;
+    }
+
+    .opening-dashboard-card:hover {
+      transform: translateY(-1px);
+    }
+
+    .opening-dashboard-card.warning {
+      border-color: rgba(245, 158, 11, .5);
+    }
+
+    .opening-dashboard-card.success {
+      border-color: rgba(34, 197, 94, .55);
+    }
+
+    .opening-dashboard-top {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 6px;
+    }
+
+    .opening-dashboard-icon {
+      font-size: 1rem;
+    }
+
+    .opening-dashboard-count {
+      font-size: 1.15rem;
+      font-weight: 900;
+      line-height: 1;
+    }
+
+    .opening-dashboard-title {
+      margin-top: 5px;
+      font-size: 0.7rem;
+      font-weight: 800;
+      color: var(--status-btn-text);
+    }
+
+    .opening-dashboard-sub {
+      margin-top: 3px;
+      font-size: 0.64rem;
+      color: var(--status-btn-text);
+      line-height: 1.3;
+    }
+
+    .opening-dashboard-list {
+      margin-top: 7px;
+      padding: 7px 8px;
+      border-radius: 8px;
+      background: rgba(245, 158, 11, .08);
+      font-size: 0.68rem;
+      color: var(--status-btn-text);
+      line-height: 1.4;
+    }
+
+    .opening-dashboard-list.success {
+      background: rgba(34, 197, 94, .08);
+      color: #22c55e;
+      font-weight: 800;
+    }
+
+    .opening-problem-branch {
+      display: inline-block;
+      margin: 2px 3px 2px 0;
+      padding: 3px 6px;
+      border-radius: 6px;
+      background: var(--status-btn-bg);
+      border: 1px solid var(--input-border);
+      cursor: pointer;
+      font-weight: 800;
+    }
+
+    .opening-problem-branch:hover {
+      border-color: #38bdf8;
+    }
+
+    .opening-branch.opening-focus {
+      animation: openingFocusPulse 1.8s ease;
+      border-color: #38bdf8 !important;
+      box-shadow: 0 0 0 3px rgba(56, 189, 248, .22), 0 0 18px rgba(56, 189, 248, .35);
+    }
+
+    @keyframes openingFocusPulse {
+      0%, 100% { transform: scale(1); }
+      20%, 60% { transform: scale(1.018); }
+      40%, 80% { transform: scale(1); }
+    }
+
+    @media (max-width: 520px) {
+      .opening-dashboard {
+        grid-template-columns: 1fr;
+      }
     }
 
   </style>
@@ -1168,7 +1418,7 @@
 
     const BRANCH_NUMBERS = [51, 37, 57, 7, 124, 148, 88, 127, 119, 68, 163, 76, 95, 98, 96, 122, 50, 53, 17, 110];
     const INITIAL_STATUSES = {"51":false,"37":false,"57":false,"7":false,"124":false,"148":false,"88":false,"127":false,"119":false,"68":false,"163":false,"76":false,"95":false,"98":false,"96":false,"122":false,"50":false,"53":false,"17":false,"110":false};
-    const APP_VERSION = '1.0.6';
+    const APP_VERSION = '1.0.8';
 
     const TELEGRAM_STICKERS = [
       "https://em-content.zobj.net/source/telegram/386/clown-face_1f921.webp",
@@ -1722,6 +1972,10 @@
     let openingResponsiblesListenerStarted = false;
     let openingEditingContact = null;
     let openingFormBranch = null;
+    let openingWakeupsData = {};
+    let openingWakeHistoryData = {};
+    let openingHistoryVisible = {};
+    let openingDashboardVisible = { tomorrow: false, wake: false };
 
     function getLocalDateKey(date = new Date()) {
       const y = date.getFullYear();
@@ -1778,6 +2032,8 @@
         const data = snapshot.val() || {};
         openingContactsData = data.contacts || {};
         openingAssignmentsData = data.assignments || {};
+        openingWakeupsData = data.wakeups || {};
+        openingWakeHistoryData = data.wakeup_history || {};
 
         if (document.getElementById('openingResponsiblesModalOverlay').classList.contains('active')) {
           renderOpeningResponsibles();
@@ -1803,6 +2059,92 @@
       return ids.length ? ids[0] : null;
     }
 
+    function getOpeningWakeup(branch, dateKey) {
+      const branchData = openingWakeupsData[dateKey]?.[String(branch)] || {};
+      const ids = Object.keys(branchData).filter(id => branchData[id]);
+      return ids.length ? { id: ids[0], ...branchData[ids[0]] } : null;
+    }
+
+    function getOpeningWakeHistory(branch, dateKey) {
+      const branchData = openingWakeHistoryData[dateKey]?.[String(branch)] || {};
+      return Object.entries(branchData)
+        .filter(([id, item]) => item && typeof item === 'object')
+        .map(([id, item]) => ({ id, ...item }))
+        .sort((a, b) => Number(b.timestamp || 0) - Number(a.timestamp || 0));
+    }
+
+    function formatOpeningTime(timestamp) {
+      if (!timestamp) return '—';
+      return new Date(Number(timestamp)).toLocaleTimeString('ru-RU', { hour: '2-digit', minute: '2-digit' });
+    }
+
+    function formatOpeningDateTime(timestamp) {
+      if (!timestamp) return '—';
+      return new Date(Number(timestamp)).toLocaleString('ru-RU', {
+        day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit'
+      });
+    }
+
+    function toggleOpeningHistory(branch) {
+      openingHistoryVisible[String(branch)] = !openingHistoryVisible[String(branch)];
+      renderOpeningResponsibles();
+    }
+
+    function getOpeningTomorrowStats(dateKey) {
+      const sortedBranches = [...BRANCH_NUMBERS].sort((a, b) => Number(a) - Number(b));
+      const missing = sortedBranches.filter(branch => !getSingleOpeningAssignedContact(branch, dateKey));
+      return {
+        total: sortedBranches.length,
+        assigned: sortedBranches.length - missing.length,
+        missing
+      };
+    }
+
+    function getOpeningWakeStats(dateKey) {
+      const sortedBranches = [...BRANCH_NUMBERS].sort((a, b) => Number(a) - Number(b));
+      const notAwake = [];
+      let awake = 0;
+
+      sortedBranches.forEach(branch => {
+        const assignedId = getSingleOpeningAssignedContact(branch, dateKey);
+        const wakeup = getOpeningWakeup(branch, dateKey);
+        if (assignedId && wakeup && wakeup.id === assignedId) {
+          awake++;
+        } else {
+          notAwake.push({
+            branch: Number(branch),
+            assigned: Boolean(assignedId)
+          });
+        }
+      });
+
+      return { total: sortedBranches.length, awake, notAwake };
+    }
+
+    function toggleOpeningDashboard(type) {
+      openingDashboardVisible[type] = !openingDashboardVisible[type];
+      renderOpeningResponsibles();
+    }
+
+    function toggleOpeningInstructions() {
+      const box = document.getElementById('openingInstructions');
+      const arrow = document.getElementById('openingInstructionsArrow');
+      if (!box) return;
+      const active = box.classList.toggle('active');
+      if (arrow) arrow.textContent = active ? '⌃' : '⌄';
+    }
+
+    function jumpToOpeningBranch(branch) {
+      const target = document.getElementById(`openingBranch_${branch}`);
+      if (!target) return;
+
+      target.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      target.classList.remove('opening-focus');
+      void target.offsetWidth;
+      target.classList.add('opening-focus');
+      setTimeout(() => target.classList.remove('opening-focus'), 1900);
+    }
+
     function renderOpeningResponsibles() {
       const body = document.getElementById('openingResponsiblesBody');
       if (!body) return;
@@ -1810,11 +2152,40 @@
       const todayKey = getLocalDateKey();
       const tomorrowKey = getTomorrowDateKey();
 
+      const tomorrowStats = getOpeningTomorrowStats(tomorrowKey);
+      const wakeStats = getOpeningWakeStats(todayKey);
+
       let html = `
-        <div class="opening-info">
-          <b>Как пользоваться:</b> один раз добавьте всех людей, которые могут открывать отделение.
-          Вечером просто выберите <b>одного человека на завтра</b> — он подсветится зелёным.
-          Номер телефона можно нажать, чтобы сразу позвонить.
+        <button type="button" class="opening-instructions-toggle" onclick="toggleOpeningInstructions()">
+          <span>ℹ️ Инструкция</span><span id="openingInstructionsArrow">⌄</span>
+        </button>
+        <div class="opening-instructions" id="openingInstructions">
+          <b>Вечером:</b> добавьте постоянных ответственных и выберите одного человека на завтра.
+          <br><b>Утром:</b> назначенный ответственный нажимает «Проснулся». После этого его не нужно обзванивать.
+          <br><b>Телефон:</b> нажмите на номер — откроется звонилка.
+          <br><b>Индикаторы:</b> нажмите на проблемное отделение, чтобы сразу перейти к нему в списке.
+        </div>
+
+        <div class="opening-dashboard">
+          <button type="button" class="opening-dashboard-card ${tomorrowStats.missing.length ? 'warning' : 'success'}" onclick="toggleOpeningDashboard('tomorrow')">
+            <div class="opening-dashboard-top">
+              <span class="opening-dashboard-icon">📅</span>
+              <span class="opening-dashboard-count">${tomorrowStats.assigned}/${tomorrowStats.total}</span>
+            </div>
+            <div class="opening-dashboard-title">Ответственный на завтра</div>
+            <div class="opening-dashboard-sub">${tomorrowStats.missing.length ? `Не назначено: ${tomorrowStats.missing.length}` : 'Все отделения назначены ✓'}</div>
+            ${tomorrowStats.missing.length && openingDashboardVisible.tomorrow ? `<div class="opening-dashboard-list">${tomorrowStats.missing.map(branch => `<span class="opening-problem-branch" onclick="event.stopPropagation(); jumpToOpeningBranch(${branch})">№${branch}</span>`).join('')}</div>` : ''}
+          </button>
+
+          <button type="button" class="opening-dashboard-card ${wakeStats.notAwake.length ? 'warning' : 'success'}" onclick="toggleOpeningDashboard('wake')">
+            <div class="opening-dashboard-top">
+              <span class="opening-dashboard-icon">☀️</span>
+              <span class="opening-dashboard-count">${wakeStats.awake}/${wakeStats.total}</span>
+            </div>
+            <div class="opening-dashboard-title">Проснулись сегодня</div>
+            <div class="opening-dashboard-sub">${wakeStats.notAwake.length ? `Ещё не отметились: ${wakeStats.notAwake.length}` : 'Все проснулись ✓'}</div>
+            ${wakeStats.notAwake.length && openingDashboardVisible.wake ? `<div class="opening-dashboard-list">${wakeStats.notAwake.map(item => `<span class="opening-problem-branch" onclick="event.stopPropagation(); jumpToOpeningBranch(${item.branch})">№${item.branch}${item.assigned ? '' : ' — нет ответственного'}</span>`).join('')}</div>` : (wakeStats.notAwake.length ? '' : '<div class="opening-dashboard-list success">Все 20 ответственных отметились ✓</div>')}
+          </button>
         </div>
 
         <div class="opening-plan-header">
@@ -1823,6 +2194,15 @@
             <div class="opening-plan-date">${formatOpeningDate(tomorrowKey)}</div>
           </div>
           <div class="opening-plan-badge">ПЛАН НА ЗАВТРА</div>
+        </div>
+
+        <div class="opening-info">
+          <b>Утром:</b> назначенный на сегодня ответственный нажимает <b>«Проснулся»</b>. После этого его можно не обзванивать. Время нажатия сохранится в истории.
+        </div>
+
+        <div class="opening-day-actions">
+          <button class="opening-reset-wakeup-btn" onclick="resetAllOpeningWakeups()">↻ Сбросить все «Проснулся»</button>
+          <button class="opening-history-btn" onclick="toggleAllOpeningHistory()">🕘 История</button>
         </div>
       `;
 
@@ -1839,9 +2219,11 @@
         const contacts = getOpeningContacts(branch);
         const tomorrowAssignedId = getSingleOpeningAssignedContact(branch, tomorrowKey);
         const todayAssignedId = getSingleOpeningAssignedContact(branch, todayKey);
+        const wakeup = getOpeningWakeup(branch, todayKey);
+        const todayHistory = getOpeningWakeHistory(branch, todayKey);
 
         html += `
-          <div class="opening-branch">
+          <div class="opening-branch" id="openingBranch_${branch}">
             <div class="opening-branch-head">
               <span class="opening-branch-name">Отделение №${branch}</span>
               <button class="opening-add-btn" onclick="showOpeningContactForm(${branch})" title="Добавить постоянного ответственного">+</button>
@@ -1875,6 +2257,14 @@
                     ${isToday ? '<span class="opening-today-label">СЕГОДНЯ</span>' : ''}
                   </div>
                   <a class="opening-phone" href="tel:${phone}" onclick="event.stopPropagation();">${phone}</a>
+                  ${isToday ? `
+                    <div class="opening-wakeup-bar">
+                      <button type="button" class="opening-wakeup-btn ${wakeup && wakeup.id === contact.id ? 'active' : ''}" onclick="event.stopPropagation(); markOpeningAwake(${branch}, '${escapeOpeningText(contact.id)}')" ${wakeup ? 'disabled' : ''}>
+                        ${wakeup && wakeup.id === contact.id ? '✓ ПРОСНУЛСЯ' : '☀️ ПРОСНУЛСЯ'}
+                      </button>
+                      ${wakeup && wakeup.id === contact.id ? `<span class="opening-wakeup-time">в ${formatOpeningTime(wakeup.timestamp)}</span>` : ''}
+                    </div>
+                  ` : ''}
                 </div>
                 <div class="opening-contact-actions">
                   <button class="opening-mini-btn" onclick="event.stopPropagation(); editOpeningContact(${branch}, '${escapeOpeningText(contact.id)}')" title="Редактировать">✎</button>
@@ -1891,6 +2281,20 @@
             }
           } else {
             html += `<div class="opening-no-assigned">⚠ На завтра ещё никто не выбран</div>`;
+          }
+
+          if (todayHistory.length > 0) {
+            html += `
+              <button class="opening-history-btn" style="margin-top:8px; width:100%;" onclick="toggleOpeningHistory(${branch})">
+                🕘 ${openingHistoryVisible[String(branch)] ? 'Скрыть историю' : `История «Проснулся» (${todayHistory.length})`}
+              </button>
+            `;
+            if (openingHistoryVisible[String(branch)]) {
+              html += `<div class="opening-history-panel active">
+                <div class="opening-history-row"><b>Когда</b><b>Кто</b></div>
+                ${todayHistory.slice(0, 10).map(item => `<div class="opening-history-row"><span>${formatOpeningDateTime(item.timestamp)}</span><span>${escapeOpeningText(item.name || 'Ответственный')}</span></div>`).join('')}
+              </div>`;
+            }
           }
         }
 
@@ -2042,6 +2446,53 @@
       updates[`${branchPath}/${contactId}`] = true;
 
       await db.ref().update(updates);
+    }
+
+    async function markOpeningAwake(branch, contactId) {
+      const todayKey = getLocalDateKey();
+      const todayAssignedId = getSingleOpeningAssignedContact(branch, todayKey);
+      if (todayAssignedId !== contactId) {
+        alert('Эта функция доступна только назначенному на сегодня ответственному.');
+        return;
+      }
+
+      const existingWakeup = getOpeningWakeup(branch, todayKey);
+      if (existingWakeup) return;
+
+      const contact = getOpeningContacts(branch).find(item => item.id === contactId);
+      if (!contact) return;
+
+      const timestamp = Date.now();
+      const wakeupData = {
+        id: contactId,
+        name: contact.name || '',
+        phone: contact.phone || '',
+        timestamp
+      };
+
+      const historyRef = db.ref(`opening_responsibles/wakeup_history/${todayKey}/${branch}`).push();
+      const updates = {};
+      updates[`opening_responsibles/wakeups/${todayKey}/${branch}/${contactId}`] = wakeupData;
+      updates[`opening_responsibles/wakeup_history/${todayKey}/${branch}/${historyRef.key}`] = wakeupData;
+      await db.ref().update(updates);
+    }
+
+    async function resetAllOpeningWakeups() {
+      const todayKey = getLocalDateKey();
+      if (!confirm('Сбросить отметки «Проснулся» у всех отделений за сегодня? История при этом сохранится.')) return;
+      await db.ref(`opening_responsibles/wakeups/${todayKey}`).remove();
+    }
+
+    function toggleAllOpeningHistory() {
+      const todayKey = getLocalDateKey();
+      const sortedBranches = [...BRANCH_NUMBERS].sort((a, b) => Number(a) - Number(b));
+      const anyOpen = sortedBranches.some(branch => openingHistoryVisible[String(branch)]);
+      sortedBranches.forEach(branch => {
+        if (getOpeningWakeHistory(branch, todayKey).length > 0) {
+          openingHistoryVisible[String(branch)] = !anyOpen;
+        }
+      });
+      renderOpeningResponsibles();
     }
 
     function escapeHtml(str) {
